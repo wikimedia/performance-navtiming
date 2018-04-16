@@ -19,6 +19,9 @@ class TestNavTiming(unittest.TestCase):
     longMessage = True
     maxDiff = None
 
+    def setUp(self):
+        self.navtiming = navtiming.NavTiming()
+
     def flatten(self, values):
         for value in values:
             if isinstance(value, list):
@@ -36,7 +39,7 @@ class TestNavTiming(unittest.TestCase):
                 uas = data.get(case)
                 for ua in uas:
                     self.assertEqual(
-                        navtiming.parse_ua(ua),
+                        self.navtiming.parse_ua(ua),
                         expect
                     )
 
@@ -55,7 +58,7 @@ class TestNavTiming(unittest.TestCase):
                 actual = []
                 # print "---", key # debug
                 for meta in messages:
-                    f = navtiming.handlers.get(meta['schema'])
+                    f = self.navtiming.handlers.get(meta['schema'])
                     assert f is not None
                     for stat in f(meta):
                         # print stat # debug
@@ -91,16 +94,16 @@ class TestNavTiming(unittest.TestCase):
             'loadEventEnd': 14
         }
 
-        self.assertTrue(navtiming.is_compliant(event, None))
+        self.assertTrue(self.navtiming.is_compliant(event, None))
 
         del event['secureConnectionStart']
         del event['domComplete']
 
-        self.assertTrue(navtiming.is_compliant(event, None))
+        self.assertTrue(self.navtiming.is_compliant(event, None))
 
         event['navigationStart'] = 7
 
-        self.assertFalse(navtiming.is_compliant(event, None))
+        self.assertFalse(self.navtiming.is_compliant(event, None))
 
 
 if __name__ == '__main__':
