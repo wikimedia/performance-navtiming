@@ -10,7 +10,7 @@ setup(
     url='https://wikitech.wikimedia.org/wiki/Webperf',
     license='Apache 2.0',
     description='Client-side metrics processing',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README')).read(),
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     packages=[
         'navtiming'
     ],
