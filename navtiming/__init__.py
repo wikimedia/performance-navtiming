@@ -423,9 +423,7 @@ class NavTiming(object):
             'firstPaint',
             'loadEventEnd',
             'loadEventStart',
-            'mediaWikiLoadComplete',
             'mediaWikiLoadEnd',
-            'mediaWikiLoadStart',
             'redirecting',
             'responseStart',
         ):
@@ -520,7 +518,6 @@ class NavTiming(object):
             'loadEventEnd',
             'loadEventStart',
             'mediaWikiLoadEnd',
-            'mediaWikiLoadStart',
             'responseStart',
         ):
             if metric in event:
@@ -550,8 +547,6 @@ class NavTiming(object):
             metrics_nav2['unload'] = event['unload']
         if 'redirecting' in event:
             metrics_nav2['redirect'] = event['redirecting']
-        if 'mediaWikiLoadComplete' in event:
-            metrics_nav2['mediaWikiLoad'] = event['mediaWikiLoadComplete']
 
         # If one of the metrics are wrong, don't send them at all
         for metric, value in metrics_nav2.items():
