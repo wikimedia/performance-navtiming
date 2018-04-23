@@ -15,19 +15,6 @@
 # - wiki: example
 
 templates:
-  - &expected_uncached_desktop_mwload
-    - frontend.navtiming.mediaWikiLoadComplete.desktop.authenticated:1270|ms
-    - frontend.navtiming.mediaWikiLoadComplete.desktop.overall:1270|ms
-    - frontend.navtiming.mediaWikiLoadComplete.overall:1270|ms
-    - frontend.navtiming.mediaWikiLoadComplete.by_browser.Firefox.55:1270|ms
-    - frontend.navtiming.mediaWikiLoadComplete.by_browser.Firefox.all:1270|ms
-    - frontend.navtiming.mediaWikiLoadComplete.by_continent.Europe:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.desktop.authenticated:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.desktop.overall:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.overall:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.by_browser.Firefox.55:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.by_browser.Firefox.all:1270|ms
-    - frontend.navtiming2.mediaWikiLoad.by_continent.Europe:1270|ms
   - &expected_uncached_desktop
     - frontend.navtiming.loadEventStart.desktop.authenticated:1965|ms
     - frontend.navtiming.loadEventStart.desktop.overall:1965|ms
@@ -156,7 +143,6 @@ templates:
     - frontend.navtiming2.domInteractive.by_browser.Firefox.55:955|ms
     - frontend.navtiming2.domInteractive.by_browser.Firefox.all:955|ms
     - frontend.navtiming2.domInteractive.by_continent.Europe:955|ms
-    - *expected_uncached_desktop_mwload
 
 # Sample from September 2017
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
@@ -175,12 +161,6 @@ Cached page view from desktop:
   - frontend.navtiming.loadEventStart.by_browser.Chrome.60:1201|ms
   - frontend.navtiming.loadEventStart.by_browser.Chrome.all:1201|ms
   - frontend.navtiming.loadEventStart.by_continent.Africa:1201|ms
-  - frontend.navtiming.mediaWikiLoadComplete.desktop.anonymous:667|ms
-  - frontend.navtiming.mediaWikiLoadComplete.desktop.overall:667|ms
-  - frontend.navtiming.mediaWikiLoadComplete.overall:667|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Chrome.60:667|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Chrome.all:667|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_continent.Africa:667|ms
   - frontend.navtiming.dnsLookup.by_continent.Africa:0|ms
   - frontend.navtiming.firstPaint.desktop.anonymous:635|ms
   - frontend.navtiming.firstPaint.desktop.overall:635|ms
@@ -304,18 +284,6 @@ Cached page view from desktop:
   - frontend.navtiming2.domInteractive.by_browser.Chrome.60:576|ms
   - frontend.navtiming2.domInteractive.by_browser.Chrome.all:576|ms
   - frontend.navtiming2.domInteractive.by_continent.Africa:576|ms
-  - frontend.navtiming2.mediaWikiLoad.desktop.anonymous:667|ms
-  - frontend.navtiming2.mediaWikiLoad.desktop.overall:667|ms
-  - frontend.navtiming2.mediaWikiLoad.overall:667|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Chrome.60:667|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Chrome.all:667|ms
-  - frontend.navtiming2.mediaWikiLoad.by_continent.Africa:667|ms
-
-# Sample from September 2017
-# https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
-Page view without NavTiming support:
- input: {"event": {"action": "delete", "isAnon": false, "isHiDPI": true, "isHttp2": true, "mediaWikiLoadComplete": 1270, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "RS", "originRegion": "VO", "pageId": 1, "revId": 1}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
- expect: *expected_uncached_desktop_mwload
 
 # Sample from September 2017
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
@@ -331,13 +299,6 @@ Mobile page view:
   - frontend.navtiming.loadEventStart.by_country.Russia:3515|ms
   - frontend.navtiming.dnsLookup.by_continent.Europe:0|ms
   - frontend.navtiming.dnsLookup.by_country.Russia:0|ms
-  - frontend.navtiming.mediaWikiLoadComplete.mobile.anonymous:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.mobile.overall:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.overall:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Mobile_Safari.9_0:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Mobile_Safari.all:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_continent.Europe:907|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_country.Russia:907|ms
   - frontend.navtiming.loadEventEnd.mobile.anonymous:3520|ms
   - frontend.navtiming.loadEventEnd.mobile.overall:3520|ms
   - frontend.navtiming.loadEventEnd.overall:3520|ms
@@ -461,13 +422,6 @@ Mobile page view:
   - frontend.navtiming2.domInteractive.by_browser.Mobile_Safari.all:2936|ms
   - frontend.navtiming2.domInteractive.by_continent.Europe:2936|ms
   - frontend.navtiming2.domInteractive.by_country.Russia:2936|ms
-  - frontend.navtiming2.mediaWikiLoad.mobile.anonymous:907|ms
-  - frontend.navtiming2.mediaWikiLoad.mobile.overall:907|ms
-  - frontend.navtiming2.mediaWikiLoad.overall:907|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Mobile_Safari.9_0:907|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Mobile_Safari.all:907|ms
-  - frontend.navtiming2.mediaWikiLoad.by_continent.Europe:907|ms
-  - frontend.navtiming2.mediaWikiLoad.by_country.Russia:907|ms
 
 # Sample from September 2017
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
@@ -477,13 +431,6 @@ View with timings above threshold (for navtiming):
   # domComplete, loadEventStart and loadEventEnd are above threshold
   - frontend.navtiming.loadEventStart.by_continent.Europe:204083|ms
   - frontend.navtiming.loadEventStart.by_country.France:204083|ms
-  - frontend.navtiming.mediaWikiLoadComplete.desktop.anonymous:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.desktop.overall:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.overall:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Edge.15:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_browser.Edge.all:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_continent.Europe:20922|ms
-  - frontend.navtiming.mediaWikiLoadComplete.by_country.France:20922|ms
   - frontend.navtiming.dnsLookup.by_continent.Europe:0|ms
   - frontend.navtiming.dnsLookup.by_country.France:0|ms
   - frontend.navtiming.firstPaint.desktop.anonymous:9356|ms
@@ -613,13 +560,6 @@ View with timings above threshold (for navtiming):
   - frontend.navtiming2.domInteractive.by_browser.Edge.all:7403|ms
   - frontend.navtiming2.domInteractive.by_continent.Europe:7403|ms
   - frontend.navtiming2.domInteractive.by_country.France:7403|ms
-  - frontend.navtiming2.mediaWikiLoad.desktop.anonymous:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.desktop.overall:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.overall:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Edge.15:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.by_browser.Edge.all:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.by_continent.Europe:20922|ms
-  - frontend.navtiming2.mediaWikiLoad.by_country.France:20922|ms
 
 # Sample from February 2018 (added 'isOversample')
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17740037
@@ -646,12 +586,6 @@ Uncached page view from desktop that includes isOversample=true:
   - frontend.navtiming_oversample.dnsLookup.by_browser.Firefox.55:1|ms
   - frontend.navtiming_oversample.dnsLookup.by_browser.Firefox.all:1|ms
   - frontend.navtiming_oversample.dnsLookup.by_continent.Europe:1|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.desktop.authenticated:1270|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.desktop.overall:1270|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.overall:1270|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.by_browser.Firefox.55:1270|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.by_browser.Firefox.all:1270|ms
-  - frontend.navtiming_oversample.mediaWikiLoadComplete.by_continent.Europe:1270|ms
   - frontend.navtiming_oversample.loadEventEnd.desktop.authenticated:1968|ms
   - frontend.navtiming_oversample.loadEventEnd.desktop.overall:1968|ms
   - frontend.navtiming_oversample.loadEventEnd.overall:1968|ms
@@ -767,12 +701,6 @@ Uncached page view from desktop that includes isOversample=true:
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.55:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.all:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_continent.Europe:955|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.desktop.authenticated:1270|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.desktop.overall:1270|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.overall:1270|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.by_browser.Firefox.55:1270|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.by_browser.Firefox.all:1270|ms
-  - frontend.navtiming2_oversample.mediaWikiLoad.by_continent.Europe:1270|ms
 
 # Sample from February 2018 (added 'isOversample', 'oversampleReason')
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17740037
