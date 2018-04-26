@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import argparse
+import etcd
 import json
 from kafka import KafkaConsumer
 import logging
@@ -13,7 +14,8 @@ import time
 
 class NavTiming(object):
     def __init__(self, brokers=['127.0.0.1:9092'], consumer_group='navtiming',
-                 statsd_host='localhost', statsd_port=8125, verbose=False,
+                 statsd_host='localhost', statsd_port=8125, datacenter=None,
+                 etcd_domain=None, etcd_path=None, etcd_refresh=10, verbose=False,
                  dry_run=False):
         self.brokers = brokers
         self.consumer_group = consumer_group
@@ -31,6 +33,19 @@ class NavTiming(object):
         formatter.converter = time.gmtime
         ch.setFormatter(formatter)
         self.log.addHandler(ch)
+
+        # Set up etcd, if needed, and establish whether this is a session leader
+        self.master = True
+        self.master_last_updated = 0
+        self.datacenter = datacenter
+        self.etcd_path = etcd_path
+        self.etcd_refresh = etcd_refresh
+        if datacenter is not None and etcd_domain is not None and etcd_path is not None:
+            self.log.info('Using etcd to check whether {} is master'.format(self.datacenter))
+            self.etcd = etcd.Client(srv_domain=etcd_domain, protocol='https',
+                                    allow_reconnect=True)
+        else:
+            self.etcd = None
 
         self.addr = self.statsd_host, self.statsd_port
         self.sock = None
@@ -111,6 +126,41 @@ class NavTiming(object):
             'RU': 'Russia',          # ~6/min
             'US': 'United States',   # ~22/min
         }
+
+    def is_master(self):
+        if self.etcd is None:
+            return True
+
+        if time.time() - self.master_last_updated < self.etcd_refresh:
+            # Whether this is the master data center was checked no more than
+            # etcd_refresh seconds ago
+            return self.master
+
+        # Update the last_update timestamp whether success or no -- don't want
+        # to pummel etcd if we're not able to update, and multiple instances
+        # writing wouldn't be that big a deal
+        self.master_last_updated = time.time()
+        try:
+            # >>> client.get('/conftool/v1/mediawiki-config/common/WMFMasterDatacenter').value
+            # u'{"val": "eqiad"}'
+            master_datacenter = json.loads(self.etcd.get(self.etcd_path).value)['val']
+            if master_datacenter == self.datacenter and not self.master:
+                self.log.info('{} is the master datacenter, going live'.format(
+                                self.datacenter))
+                self.master = True
+            elif master_datacenter != self.datacenter and self.master:
+                self.log.info('{} is not the master datacenter, disabling consumer'.format(
+                                self.datacenter))
+                self.master = False
+            else:
+                self.log.debug('{} was already the {} datacenter'.format(
+                                self.datacenter,
+                                'master' if master_datacenter == self.datacenter else 'secondary'))
+        except KeyError:
+            self.log.warning('etcd key {} may be malformed (KeyError raised)'.format(self.etcd_path))
+        except etcd.EtcdKeyNotFound:
+            self.log.warning('etcd key {} not found'.format(self.etcd_path))
+        return self.master
 
     # Only return the small subset of browsers we whitelisted, this to avoid arbitrary growth
     # in Graphite with low-sampled properties that are not useful
@@ -582,8 +632,13 @@ class NavTiming(object):
         kafka_bootstrap_servers = tuple(self.brokers)
         kafka_topics = ['eventlogging_' + key for key in self.handlers.keys()]
 
+        consumer = None
         while True:
             try:
+                if not self.is_master():
+                    time.sleep(self.etcd_refresh + 1)
+                    self.log.info('Checking whether datacenter has been promoted')
+                    continue
                 self.log.info('Starting Kafka connection to brokers ({})'.format(
                                              kafka_bootstrap_servers))
                 consumer = KafkaConsumer(
@@ -598,6 +653,12 @@ class NavTiming(object):
                 self.log.info('Starting statsv Kafka consumer.')
 
                 for message in consumer:
+                    # Check whether we should be running
+                    if not self.is_master():
+                        self.log.info('No longer running in the master datacenter')
+                        self.log.info('Stopping consuming')
+                        consumer.close()
+                        break
                     meta = json.loads(message.value)
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
@@ -621,6 +682,14 @@ def main():
     ap.add_argument('--statsd-host', default='localhost',
                     type=socket.gethostbyname)
     ap.add_argument('--statsd-port', default=8125, type=int)
+    ap.add_argument('--datacenter', required=False, default=None,
+                    dest='datacenter', help='Current datacenter (eg, eqiad)')
+    ap.add_argument('--etcd-domain', required=False, default=None,
+                    dest='etcd_domain', help='Domain to use for etcd srv lookup')
+    ap.add_argument('--etcd-path', required=False, default=None,
+                    dest='etcd_path', help='Where to find the etcd MasterDatacenter value')
+    ap.add_argument('--etcd-refresh', required=False, default=10,
+                    dest='etcd_refresh', help='Seconds to wait before refreshing etcd')
     ap.add_argument('-v', '--verbose', required=False, default=False,
                     help='Verbose logging', action='store_true')
     ap.add_argument('-n', '--dry-run', dest='dry_run', action='store_true',
@@ -632,6 +701,10 @@ def main():
                    consumer_group=args.consumer_group,
                    statsd_host=args.statsd_host,
                    statsd_port=args.statsd_port,
+                   datacenter=args.datacenter,
+                   etcd_domain=args.etcd_domain,
+                   etcd_path=args.etcd_path,
+                   etcd_refresh=args.etcd_refresh,
                    verbose=args.verbose,
                    dry_run=args.dry_run)
     nt.run()

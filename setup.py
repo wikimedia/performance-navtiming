@@ -16,7 +16,8 @@ setup(
     ],
     install_requires=[
         'pyyaml',
-        'kafka-python'
+        'kafka-python',
+        'python-etcd'
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

@@ -1,2 +1,3 @@
 pyyaml
 kafka-python
+python-etcd
