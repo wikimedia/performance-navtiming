@@ -657,7 +657,8 @@ class NavTiming(object):
                     if not self.is_master():
                         self.log.info('No longer running in the master datacenter')
                         self.log.info('Stopping consuming')
-                        consumer.close()
+                        if consumer is not None:
+                            consumer.close()
                         break
                     meta = json.loads(message.value)
                     if 'schema' in meta:
@@ -673,27 +674,58 @@ class NavTiming(object):
                 self.log.exception('Unhandled exception in main loop, restarting consumer')
 
 
-def main():
+def main(cluster=None, config=None):
+    parsed_configs = {}
+    if cluster and config and cluster in config.sections():
+        parsed_configs = config[cluster]
+
     ap = argparse.ArgumentParser(description='NavigationTiming subscriber')
-    ap.add_argument('--brokers', required=True,
+    ap.add_argument('--brokers',
+                    required=False if parsed_configs.get('brokers') else True,
+                    default=parsed_configs.get('brokers'),
                     help='Comma-separated list of kafka brokers')
-    ap.add_argument('--consumer-group', required=True,
+    ap.add_argument('--consumer-group',
+                    required=False if parsed_configs.get('consumer_group') else True,
+                    default=parsed_configs.get('consumer_group'),
                     help='Consumer group to register with Kafka')
-    ap.add_argument('--statsd-host', default='localhost',
+    ap.add_argument('--statsd-host',
+                    default=parsed_configs.get('statsd_host', 'localhost'),
                     type=socket.gethostbyname)
-    ap.add_argument('--statsd-port', default=8125, type=int)
-    ap.add_argument('--datacenter', required=False, default=None,
-                    dest='datacenter', help='Current datacenter (eg, eqiad)')
-    ap.add_argument('--etcd-domain', required=False, default=None,
-                    dest='etcd_domain', help='Domain to use for etcd srv lookup')
-    ap.add_argument('--etcd-path', required=False, default=None,
-                    dest='etcd_path', help='Where to find the etcd MasterDatacenter value')
-    ap.add_argument('--etcd-refresh', required=False, default=10,
-                    dest='etcd_refresh', help='Seconds to wait before refreshing etcd')
-    ap.add_argument('-v', '--verbose', required=False, default=False,
-                    help='Verbose logging', action='store_true')
-    ap.add_argument('-n', '--dry-run', dest='dry_run', action='store_true',
-                    required=False, default=False,
+    ap.add_argument('--statsd-port',
+                    default=int(parsed_configs.get('statsd_port', 8125)),
+                    type=int)
+    ap.add_argument('--datacenter',
+                    required=False,
+                    default=cluster,
+                    dest='datacenter',
+                    help='Current datacenter (eg, eqiad)')
+    ap.add_argument('--etcd-domain',
+                    required=False,
+                    default=parsed_configs.get('etcd_domain'),
+                    dest='etcd_domain',
+                    help='Domain to use for etcd srv lookup')
+    ap.add_argument('--etcd-path',
+                    required=False,
+                    default=parsed_configs.get('etcd_path'),
+                    dest='etcd_path',
+                    help='Where to find the etcd MasterDatacenter value')
+    ap.add_argument('--etcd-refresh',
+                    required=False,
+                    default=float(parsed_configs.get('etcd_refresh', 10)),
+                    dest='etcd_refresh',
+                    help='Seconds to wait before refreshing etcd')
+    ap.add_argument('-v',
+                    '--verbose',
+                    required=False,
+                    default=False,
+                    help='Verbose logging',
+                    action='store_true')
+    ap.add_argument('-n',
+                    '--dry-run',
+                    dest='dry_run',
+                    action='store_true',
+                    required=False,
+                    default=False,
                     help='Dry-run (don\'t actually submit to statsd)')
     args = ap.parse_args()
 
