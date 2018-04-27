@@ -650,7 +650,7 @@ class NavTiming(object):
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
                 consumer.subscribe(kafka_topics)
 
-                self.log.info('Starting statsv Kafka consumer.')
+                self.log.info('Starting NavTiming Kafka consumer.')
 
                 for message in consumer:
                     # Check whether we should be running
