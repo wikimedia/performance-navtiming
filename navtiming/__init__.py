@@ -598,6 +598,10 @@ class NavTiming(object):
         if 'redirecting' in event:
             metrics_nav2['redirect'] = event['redirecting']
 
+        # If we got gaps in the Navigation Timing metrics, collect them
+        if 'gaps' in event:
+            metrics_nav2['gaps'] = event['gaps']
+
         # If one of the metrics are wrong, don't send them at all
         for metric, value in metrics_nav2.items():
             isSane = self.is_sanev2(value)
