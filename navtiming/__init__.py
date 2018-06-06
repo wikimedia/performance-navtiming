@@ -52,7 +52,8 @@ class NavTiming(object):
 
         self.handlers = {
             'NavigationTiming': self.handle_navigation_timing,
-            'SaveTiming': self.handle_save_timing
+            'SaveTiming': self.handle_save_timing,
+            'QuickSurveysResponses': self.handle_quick_surveys_responses
         }
 
         # Mapping of continent names to ISO 3166 country codes.
@@ -455,6 +456,20 @@ class NavTiming(object):
             if version:
                 yield self.make_stat('mw.performance.save_by_version',
                                      version.replace('.', '_'), duration)
+
+    def handle_quick_surveys_responses(self, meta):
+        event = meta['event']
+        wiki = meta['wiki']
+        surveyCodeName = event.get('surveyCodeName')
+        surveyResponseValue = event.get('surveyResponseValue')
+
+        if surveyCodeName != 'perceived-performance-survey' or not wiki or not surveyResponseValue:
+            return
+
+        # Example: ext-quicksurveys-example-internal-survey-answer-neutral
+        response = surveyResponseValue[48:]
+
+        yield self.make_count('performance.survey', wiki, response)
 
     def handle_navigation_timing(self, meta):
         event = meta['event']
