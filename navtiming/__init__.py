@@ -645,6 +645,15 @@ class NavTiming(object):
                 if country_name is not None:
                     yield self.make_stat(prefix, metric, 'by_country', country_name, value)
 
+    def return_commit_callback(self):
+        # Closure so that log config carries over
+        def commit_callback(offsets, response):
+            if isinstance(response, Exception):
+                self.log.error('Exception trying to commit offsets {}: {}'.format(offsets, response))
+            else:
+                self.log.debug('Committed offsets [{}]'.format(offsets))
+        return commit_callback
+
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -664,10 +673,14 @@ class NavTiming(object):
                     bootstrap_servers=kafka_bootstrap_servers,
                     group_id=self.consumer_group,
                     auto_offset_reset='latest',
-                    enable_auto_commit=True
+                    enable_auto_commit=True,
+                    default_offset_commit_callback=self.return_commit_callback()
                 )
+
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
                 consumer.subscribe(kafka_topics)
+                # Force the consumer to go to the most recent message
+                consumer.seek_to_end()
 
                 self.log.info('Starting NavTiming Kafka consumer.')
 
