@@ -6,6 +6,7 @@ import argparse
 import etcd
 import json
 from kafka import KafkaConsumer
+from kafka.structs import TopicPartition
 import logging
 import re
 import socket
@@ -679,7 +680,14 @@ class NavTiming(object):
 
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
                 consumer.subscribe(kafka_topics)
-                # Force the consumer to go to the most recent message
+                # Force the consumer to go to the most recent message.  Need to
+                # assign partitions manually, see https://github.com/dpkp/kafka-python/issues/601
+                assignments = []
+                for topic in kafka_topics:
+                    partitions = consumer.partitions_for_topic(topic)
+                    for p in partitions:
+                        assignments.append(TopicPartition(topic, p))
+                consumer.assign(assignments)
                 consumer.seek_to_end()
 
                 self.log.info('Starting NavTiming Kafka consumer.')
