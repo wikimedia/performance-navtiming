@@ -679,7 +679,6 @@ class NavTiming(object):
                 )
 
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
-                consumer.subscribe(kafka_topics)
                 # Force the consumer to go to the most recent message.  Need to
                 # assign partitions manually, see https://github.com/dpkp/kafka-python/issues/601
                 assignments = []
