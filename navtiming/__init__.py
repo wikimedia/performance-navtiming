@@ -129,6 +129,16 @@ class NavTiming(object):
             'US': 'United States',   # ~22/min
         }
 
+        self.save_by_wiki_whitelist = {
+            'commonswiki': 'group1',   # commons.wikimedia.org
+            'enwiktionary': 'group1',  # en.wiktionary.org
+            'frwiktionary': 'group1',  # fr.wiktionary.org
+            'wikidatawiki': 'group1',  # www.wikidata.org
+            'enwiki': 'group2',        # en.wikipedia.org
+            'frwiki': 'group2',        # fr.wikipedia.org
+            'ruwiki': 'group2',        # ru.wikipedia.org
+        }
+
     def is_master(self):
         if self.etcd is None:
             return True
@@ -448,15 +458,16 @@ class NavTiming(object):
 
     def handle_save_timing(self, meta):
         event = meta['event']
+        wiki = meta['wiki']
         duration = event.get('saveTiming')
-        version = event.get('mediaWikiVersion')
-        if duration is None:
-            duration = event.get('duration')
-        if duration and self.is_sane(duration):
+        if duration is not None:
             yield self.make_stat('mw.performance.save', duration)
-            if version:
-                yield self.make_stat('mw.performance.save_by_version',
-                                     version.replace('.', '_'), duration)
+            if wiki in self.save_by_wiki_whitelist:
+                group = self.save_by_wiki_whitelist[wiki]
+                yield self.make_stat('mw.performance.save_by_group',
+                                     group.replace('.', '_'), duration)
+            else:
+                yield self.make_stat('mw.performance.save_by_group.other', duration)
 
     def handle_quick_surveys_responses(self, meta):
         event = meta['event']

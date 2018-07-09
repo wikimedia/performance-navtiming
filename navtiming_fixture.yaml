@@ -3,16 +3,15 @@
 # When using data from a production sample, be sure to anonimise the
 # following properties:
 # - event
+#    # Schema:NavigationTiming
 #    - namespaceId: 1
 #    - revId: 1
 #    - pageId: 1
 # - recvFrom: example
-# - revision: 1
 # - seqId: 1
 # - timestamp: 1
 # - uuid: example
 # - webHost: example
-# - wiki: example
 
 templates:
   - &expected_uncached_desktop
@@ -764,17 +763,29 @@ Page view without NavTiming support:
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.all:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Europe:1270|ms
 
-# Sample from September 2017
+# Sample from September 2017, and July 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:SaveTiming&oldid=15396492
 SaveTiming:
  input:
   - {"event": {"mediaWikiVersion": "1.30.0-wmf.14", "saveTiming": 2526}, "recvFrom": "example", "revision": 1, "schema": "SaveTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 7\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"54\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
   - {"event": {"mediaWikiVersion": "1.30.0-wmf.14", "saveTiming": 1042}, "recvFrom": "example", "revision": 1, "schema": "SaveTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"11\", \"browser_family\": \"IE\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
   - {"event": {"mediaWikiVersion": "1.30.0-wmf.14", "saveTiming": 2729}, "recvFrom": "example", "revision": 1, "schema": "SaveTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 10\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"60\", \"browser_family\": \"Chrome\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
+  - {"event": {"mediaWikiVersion": "1.32.0-wmf.10", "saveTiming": 3353}, "recvFrom": "example", "revision": 15396492, "schema": "SaveTiming", "seqId": 1, "userAgent": {"browser_family": "Chrome", "browser_major": "67", "browser_minor": "0", "device_family": "Other", "is_bot": false, "is_mediawiki": false, "os_family": "Windows", "os_major": "7", "os_minor": null, "wmf_app_version": "-"}, "uuid": "example", "webHost": "example", "wiki": "enwiki"}
+  - {"event": {"mediaWikiVersion": "1.32.0-wmf.10", "saveTiming": 651}, "recvFrom": "example", "revision": 15396492, "schema": "SaveTiming", "seqId": 1, "userAgent": {"browser_family": "Chrome", "browser_major": "67", "browser_minor": "0", "device_family": "Other", "is_bot": false, "is_mediawiki": false, "os_family": "Windows", "os_major": "7", "os_minor": null, "wmf_app_version": "-"}, "uuid": "example", "webHost": "example", "wiki": "commonswiki"}
+  - {"event": {"mediaWikiVersion": "1.32.0-wmf.10", "saveTiming": 739}, "recvFrom": "example", "revision": 15396492, "schema": "SaveTiming", "seqId": 1, "userAgent": {"browser_family": "Chrome", "browser_major": "67", "browser_minor": "0", "device_family": "Other", "is_bot": false, "is_mediawiki": false, "os_family": "Windows", "os_major": "7", "os_minor": null, "wmf_app_version": "-"}, "uuid": "example", "webHost": "example", "wiki": "wikidatawiki"}
+  - {"event": {"mediaWikiVersion": "1.32.0-wmf.10", "saveTiming": 949}, "recvFrom": "example", "revision": 15396492, "schema": "SaveTiming", "seqId": 1, "userAgent": {"browser_family": "Chrome", "browser_major": "67", "browser_minor": "0", "device_family": "Other", "is_bot": false, "is_mediawiki": false, "os_family": "Windows", "os_major": "7", "os_minor": null, "wmf_app_version": "-"}, "uuid": "example", "webHost": "example", "wiki": "mediawikiwiki"}
  expect:
   - mw.performance.save:1042|ms
   - mw.performance.save:2526|ms
   - mw.performance.save:2729|ms
-  - mw.performance.save_by_version.1_30_0-wmf_14:1042|ms
-  - mw.performance.save_by_version.1_30_0-wmf_14:2526|ms
-  - mw.performance.save_by_version.1_30_0-wmf_14:2729|ms
+  - mw.performance.save:3353|ms
+  - mw.performance.save:651|ms
+  - mw.performance.save:739|ms
+  - mw.performance.save:949|ms
+  - mw.performance.save_by_group.group1:651|ms
+  - mw.performance.save_by_group.group1:739|ms
+  - mw.performance.save_by_group.group2:3353|ms
+  - mw.performance.save_by_group.other:1042|ms
+  - mw.performance.save_by_group.other:2526|ms
+  - mw.performance.save_by_group.other:2729|ms
+  - mw.performance.save_by_group.other:949|ms
