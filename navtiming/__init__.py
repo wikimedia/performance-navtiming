@@ -408,10 +408,7 @@ class NavTiming(object):
         stat = '%s:%s|c' % (name, value)
         return stat.encode('utf-8')
 
-    def is_sane(self, value):
-        return isinstance(value, int) and value > 0 and value < 180000
-
-    def is_sanev2(self, value):
+    def is_sane_navtiming2(self, value):
         return isinstance(value, int) and value >= 0
 
     #
@@ -490,32 +487,6 @@ class NavTiming(object):
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
-        metrics = {}
-
-        for metric in (
-            'dnsLookup',
-            'domComplete',
-            'domInteractive',
-            'fetchStart',
-            'firstPaint',
-            'loadEventEnd',
-            'loadEventStart',
-            'mediaWikiLoadEnd',
-            'redirecting',
-            'responseStart',
-        ):
-            if metric in event:
-                metrics[metric] = event[metric]
-
-        for difference, minuend, subtrahend in (
-            ('waiting', 'responseStart', 'requestStart'),
-            ('connecting', 'connectEnd', 'connectStart'),
-            ('receiving', 'responseEnd', 'responseStart'),
-            ('sslNegotiation', 'connectEnd', 'secureConnectionStart'),
-        ):
-            if minuend in event and subtrahend in event:
-                metrics[difference] = event[minuend] - event[subtrahend]
-
         if 'mobileMode' in event:
             if event['mobileMode'] == 'stable':
                 site = 'mobile'
@@ -563,28 +534,6 @@ class NavTiming(object):
 
         ua = self.parse_ua(meta['userAgent']) or ('Other', '_')
 
-        for metric, value in metrics.items():
-            if is_oversample:
-                prefix = 'frontend.navtiming_oversample'
-            else:
-                prefix = 'frontend.navtiming'
-
-            if self.is_sane(value):
-                yield self.make_stat(prefix, metric, site, auth, value)
-                yield self.make_stat(prefix, metric, site, 'overall', value)
-                yield self.make_stat(prefix, metric, 'overall', value)
-
-                yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
-                yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
-
-            if continent is not None:
-                yield self.make_stat(prefix, metric, 'by_continent', continent, value)
-
-            if country_name is not None:
-                yield self.make_stat(prefix, metric, 'by_country', country_name, value)
-
-        # This is the new setup that could potentially replace the old one
-        # but to do that, we need to keep part of the above code
         metrics_nav2 = {}
         isSane = True
 
@@ -631,7 +580,7 @@ class NavTiming(object):
 
         # If one of the metrics are wrong, don't send them at all
         for metric, value in metrics_nav2.items():
-            isSane = self.is_sanev2(value)
+            isSane = self.is_sane_navtiming2(value)
             if not isSane:
                 break
 
