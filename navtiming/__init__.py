@@ -296,87 +296,87 @@ class NavTiming(object):
         Parses raw user agent
         """
         # Chrome for iOS
-        m = re.search('CriOS/(\d+)', ua)
+        m = re.search(r'CriOS/(\d+)', ua)
         if m is not None:
             return ('Chrome_Mobile_iOS', m.group(1))
 
         # Mobile Safari on iOS
-        m = re.search('OS [\d_]+ like Mac OS X.*Version/([\d.]+).+Safari', ua)
+        m = re.search(r'OS [\d_]+ like Mac OS X.*Version/([\d.]+).+Safari', ua)
         if m is not None:
             return ('Mobile_Safari', '_'.join(m.group(1).split('.')[:2]))
 
         # iOS WebView
-        m = re.search('OS ([\d_]+) like Mac OS X.*Mobile', ua)
+        m = re.search(r'OS ([\d_]+) like Mac OS X.*Mobile', ua)
         if m is not None:
             return ('iOS_WebView', '_'.join(m.group(1).split('_')[:2]))
 
         # Opera 14 for Android (WebKit-based)
-        m = re.search('Mobile.*OPR/(\d+)', ua)
+        m = re.search(r'Mobile.*OPR/(\d+)', ua)
         if m is not None:
             return ('Opera_Mobile', m.group(1))
 
         # Android browser (pre Android 4.4)
-        m = re.search('Android (\d).*Version/[\d.]+', ua)
+        m = re.search(r'Android (\d).*Version/[\d.]+', ua)
         if m is not None:
             return ('Android', m.group(1))
 
         # Chrome for Android
-        m = re.search('Android.*Chrome/(\d+)', ua)
+        m = re.search(r'Android.*Chrome/(\d+)', ua)
         if m is not None:
             return ('Chrome_Mobile', m.group(1))
 
         # Opera >= 15 (Desktop)
-        m = re.search('Chrome.*OPR/(\d+)', ua)
+        m = re.search(r'Chrome.*OPR/(\d+)', ua)
         if m is not None:
             return ('Opera', m.group(1))
 
         # Internet Explorer 11
-        m = re.search('Trident.*rv:11\.', ua)
+        m = re.search(r'Trident.*rv:11\.', ua)
         if m is not None:
             return ('MSIE', '11')
 
         # Internet Explorer <= 10
-        m = re.search('MSIE (\d+)', ua)
+        m = re.search(r'MSIE (\d+)', ua)
         if m is not None:
             return ('MSIE', m.group(1))
 
         # Firefox for Android
-        m = re.search('(?:Mobile|Tablet);.*Firefox/(\d+)', ua)
+        m = re.search(r'(?:Mobile|Tablet);.*Firefox/(\d+)', ua)
         if m is not None:
             return ('Firefox_Mobile', m.group(1))
 
         # Firefox (Desktop)
-        m = re.search('Firefox/(\d+)', ua)
+        m = re.search(r'Firefox/(\d+)', ua)
         if m is not None:
             return ('Firefox', m.group(1))
 
         # Microsoft Edge
-        m = re.search('Edge/(\d+)\.', ua)
+        m = re.search(r'Edge/(\d+)\.', ua)
         if m is not None:
             return ('Edge', m.group(1))
 
         # Chrome/Chromium
-        m = re.search('(Chromium|Chrome)/(\d+)\.', ua)
+        m = re.search(r'(Chromium|Chrome)/(\d+)\.', ua)
         if m is not None:
             return (m.group(1), m.group(2))
 
         # Safari (Desktop)
-        m = re.search('Version/(\d+).+Safari/', ua)
+        m = re.search(r'Version/(\d+).+Safari/', ua)
         if m is not None:
             return ('Safari', m.group(1))
 
         # Misc iOS
-        m = re.search('OS ([\d_]+) like Mac OS X', ua)
+        m = re.search(r'OS ([\d_]+) like Mac OS X', ua)
         if m is not None:
             return ('iOS_other', '_'.join(m.group(1).split('_')[:2]))
 
         # Opera <= 12 (Desktop)
-        m = re.match('Opera/9.+Version/(\d+)', ua)
+        m = re.match(r'Opera/9.+Version/(\d+)', ua)
         if m is not None:
             return ('Opera', m.group(1))
 
         # Opera < 10 (Desktop)
-        m = re.match('Opera/(\d+)', ua)
+        m = re.match(r'Opera/(\d+)', ua)
         if m is not None:
             return ('Opera', m.group(1))
 
