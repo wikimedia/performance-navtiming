@@ -201,6 +201,7 @@ class NavTiming(object):
             return self.parse_ua_obj(json.loads(ua))
         # Else this should be a raw User-Agent string.
         else:
+            self.log.info('Event contains legacy userAgent field [{}]'.format(ua))
             return self.parse_ua_legacy(ua)
 
     def parse_ua_obj(self, ua_obj):
