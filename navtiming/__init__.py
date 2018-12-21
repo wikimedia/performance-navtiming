@@ -8,7 +8,6 @@ import json
 from kafka import KafkaConsumer
 from kafka.structs import TopicPartition
 import logging
-import re
 import socket
 import time
 
@@ -195,14 +194,8 @@ class NavTiming(object):
         if isinstance(ua, dict):
             return self.parse_ua_obj(ua)
 
-        # Trick: Else if a string and wmf_app_version is there,
-        # this is a digested user agent.
-        if re.search('wmf_app_version', ua) is not None:
-            return self.parse_ua_obj(json.loads(ua))
-        # Else this should be a raw User-Agent string.
-        else:
-            self.log.info('Event contains legacy userAgent field [{}]'.format(ua))
-            return self.parse_ua_legacy(ua)
+        # Else it's a json-string of the digested user agent.
+        return self.parse_ua_obj(json.loads(ua))
 
     def parse_ua_obj(self, ua_obj):
         """
@@ -291,97 +284,6 @@ class NavTiming(object):
             version = '_'
 
         return (browser_family, version)
-
-    def parse_ua_legacy(self, ua):
-        """
-        Parses raw user agent
-        """
-        # Chrome for iOS
-        m = re.search(r'CriOS/(\d+)', ua)
-        if m is not None:
-            return ('Chrome_Mobile_iOS', m.group(1))
-
-        # Mobile Safari on iOS
-        m = re.search(r'OS [\d_]+ like Mac OS X.*Version/([\d.]+).+Safari', ua)
-        if m is not None:
-            return ('Mobile_Safari', '_'.join(m.group(1).split('.')[:2]))
-
-        # iOS WebView
-        m = re.search(r'OS ([\d_]+) like Mac OS X.*Mobile', ua)
-        if m is not None:
-            return ('iOS_WebView', '_'.join(m.group(1).split('_')[:2]))
-
-        # Opera 14 for Android (WebKit-based)
-        m = re.search(r'Mobile.*OPR/(\d+)', ua)
-        if m is not None:
-            return ('Opera_Mobile', m.group(1))
-
-        # Android browser (pre Android 4.4)
-        m = re.search(r'Android (\d).*Version/[\d.]+', ua)
-        if m is not None:
-            return ('Android', m.group(1))
-
-        # Chrome for Android
-        m = re.search(r'Android.*Chrome/(\d+)', ua)
-        if m is not None:
-            return ('Chrome_Mobile', m.group(1))
-
-        # Opera >= 15 (Desktop)
-        m = re.search(r'Chrome.*OPR/(\d+)', ua)
-        if m is not None:
-            return ('Opera', m.group(1))
-
-        # Internet Explorer 11
-        m = re.search(r'Trident.*rv:11\.', ua)
-        if m is not None:
-            return ('MSIE', '11')
-
-        # Internet Explorer <= 10
-        m = re.search(r'MSIE (\d+)', ua)
-        if m is not None:
-            return ('MSIE', m.group(1))
-
-        # Firefox for Android
-        m = re.search(r'(?:Mobile|Tablet);.*Firefox/(\d+)', ua)
-        if m is not None:
-            return ('Firefox_Mobile', m.group(1))
-
-        # Firefox (Desktop)
-        m = re.search(r'Firefox/(\d+)', ua)
-        if m is not None:
-            return ('Firefox', m.group(1))
-
-        # Microsoft Edge
-        m = re.search(r'Edge/(\d+)\.', ua)
-        if m is not None:
-            return ('Edge', m.group(1))
-
-        # Chrome/Chromium
-        m = re.search(r'(Chromium|Chrome)/(\d+)\.', ua)
-        if m is not None:
-            return (m.group(1), m.group(2))
-
-        # Safari (Desktop)
-        m = re.search(r'Version/(\d+).+Safari/', ua)
-        if m is not None:
-            return ('Safari', m.group(1))
-
-        # Misc iOS
-        m = re.search(r'OS ([\d_]+) like Mac OS X', ua)
-        if m is not None:
-            return ('iOS_other', '_'.join(m.group(1).split('_')[:2]))
-
-        # Opera <= 12 (Desktop)
-        m = re.match(r'Opera/9.+Version/(\d+)', ua)
-        if m is not None:
-            return ('Opera', m.group(1))
-
-        # Opera < 10 (Desktop)
-        m = re.match(r'Opera/(\d+)', ua)
-        if m is not None:
-            return ('Opera', m.group(1))
-
-        return ('Other', '_')
 
     def dispatch_stat(self, stat):
         if self.sock and self.addr and not self.dry_run:
