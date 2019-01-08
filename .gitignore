@@ -1,8 +1,11 @@
+# Development
 *.egg-info/
 .eggs/
 *.pyc
 .tox/
 build/
-dist/
 __pycache__/
 .DS_Store
+
+# Deployment
+scap/log
