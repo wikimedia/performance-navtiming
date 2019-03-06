@@ -53,7 +53,8 @@ class NavTiming(object):
         self.handlers = {
             'NavigationTiming': self.handle_navigation_timing,
             'SaveTiming': self.handle_save_timing,
-            'QuickSurveysResponses': self.handle_quick_surveys_responses
+            'QuickSurveysResponses': self.handle_quick_surveys_responses,
+            'PaintTiming': self.handle_paint_timing
         }
 
         # Mapping of continent names to ISO 3166 country codes.
@@ -383,12 +384,42 @@ class NavTiming(object):
 
         yield self.make_count('performance.survey', wiki, response)
 
-    def handle_navigation_timing(self, meta):
+    def handle_paint_timing(self, meta):
         event = meta['event']
 
-        if not self.is_compliant(event, meta['userAgent']):
-            yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
+        try:
+            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+        except Exception:
             return
+
+        if event['name'] == 'first-paint':
+            metric = 'firstPaint'
+        elif event['name'] == 'first-contentful-paint':
+            metric = 'firstContentfulPaint'
+        else:
+            yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
+            return
+
+        value = event['startTime']
+
+        if not self.is_sane_navtiming2(value):
+            yield self.make_count('frontend.painttiming_discard', 'isSane')
+            return
+
+        # PaintTiming is funneled to navtiming2 for backwards compatibility
+        for stat in self.make_navigation_timing_stats(
+                site,
+                auth,
+                ua,
+                continent,
+                country_name,
+                is_oversample,
+                metric,
+                value):
+            yield stat
+
+    def get_navigation_timing_context(self, meta):
+        event = meta['event']
 
         if 'mobileMode' in event:
             if event['mobileMode'] == 'stable':
@@ -416,11 +447,11 @@ class NavTiming(object):
                 # so no reason to even make the metrics
                 self.log.warning('Invalid oversampleReason value: "{}"'.format(
                     event['oversampleReason']))
-                return
+                raise
             except Exception:
                 # Same case here, but we can't even log anything useful
                 self.log.exception('Unknown exception trying to decode oversample reasons')
-                return
+                raise
 
             # If we're oversampling by geo, use the country code.  The
             # whitelist is helpful for normal sampling, but defeats the
@@ -436,6 +467,39 @@ class NavTiming(object):
             is_oversample = False
 
         ua = self.parse_ua(meta['userAgent']) or ('Other', '_')
+
+        return site, auth, ua, continent, country_name, is_oversample
+
+    def make_navigation_timing_stats(self, site, auth, ua, continent, country_name, is_oversample, metric, value):
+        if is_oversample:
+            prefix = 'frontend.navtiming2_oversample'
+        else:
+            prefix = 'frontend.navtiming2'
+
+        yield self.make_stat(prefix, metric, site, auth, value)
+        yield self.make_stat(prefix, metric, site, 'overall', value)
+        yield self.make_stat(prefix, metric, 'overall', value)
+
+        yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
+        yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
+
+        if continent is not None:
+            yield self.make_stat(prefix, metric, 'by_continent', continent, value)
+
+        if country_name is not None:
+            yield self.make_stat(prefix, metric, 'by_country', country_name, value)
+
+    def handle_navigation_timing(self, meta):
+        event = meta['event']
+
+        if not self.is_compliant(event, meta['userAgent']):
+            yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
+            return
+
+        try:
+            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+        except Exception:
+            return
 
         metrics_nav2 = {}
         isSane = True
@@ -492,22 +556,17 @@ class NavTiming(object):
             yield self.make_count('frontend.navtiming_discard', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
-                if is_oversample:
-                    prefix = 'frontend.navtiming2_oversample'
-                else:
-                    prefix = 'frontend.navtiming2'
-                yield self.make_stat(prefix, metric, site, auth, value)
-                yield self.make_stat(prefix, metric, site, 'overall', value)
-                yield self.make_stat(prefix, metric, 'overall', value)
-
-                yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
-                yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
-
-                if continent is not None:
-                    yield self.make_stat(prefix, metric, 'by_continent', continent, value)
-
-                if country_name is not None:
-                    yield self.make_stat(prefix, metric, 'by_country', country_name, value)
+                for stat in self.make_navigation_timing_stats(
+                    site,
+                    auth,
+                    ua,
+                    continent,
+                    country_name,
+                    is_oversample,
+                    metric,
+                    value
+                ):
+                    yield stat
 
     def return_commit_callback(self):
         # Closure so that log config carries over
