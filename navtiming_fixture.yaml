@@ -467,7 +467,7 @@ Uncached page view from desktop that includes isOversample=true and oversampleRe
 # Sample from April 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
 Page view without NavTiming support:
- input: {"event": {"isOversample": false, "mediaWikiLoadEnd": 1270, "namespaceId": 1, "originCountry": "RS", "originRegion": "VO"}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
+ input: {"event": {"isOversample": false, "mediaWikiLoadEnd": 1270, "namespaceId": 1, "originCountry": "RS", "originRegion": "VO"}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  expect:
     - frontend.navtiming2.mediaWikiLoadEnd.desktop.authenticated:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.desktop.overall:1270|ms
@@ -475,6 +475,7 @@ Page view without NavTiming support:
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.55:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.all:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Europe:1270|ms
+    - frontend.navtiming_group.group1:1|c
 
 # Sample from September 2017, and July 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:SaveTiming&oldid=15396492
@@ -502,3 +503,18 @@ SaveTiming:
   - mw.performance.save_by_group.other:2526|ms
   - mw.performance.save_by_group.other:2729|ms
   - mw.performance.save_by_group.other:949|ms
+
+# Sample from April 2019
+# https://meta.wikimedia.org/w/index.php?title=Schema:PaintTiming&oldid=19000009
+PaintTiming:
+ input:
+  - {"event": {"pageviewToken":"example", "name":"first-paint", "startTime":805, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema":"PaintTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+ expect:
+  - frontend.navtiming2_oversample.firstPaint.desktop.authenticated:805|ms
+  - frontend.navtiming2_oversample.firstPaint.desktop.overall:805|ms
+  - frontend.navtiming2_oversample.firstPaint.overall:805|ms
+  - frontend.navtiming2_oversample.firstPaint.by_browser.Firefox.55:805|ms
+  - frontend.navtiming2_oversample.firstPaint.by_browser.Firefox.all:805|ms
+  - frontend.navtiming2_oversample.firstPaint.by_continent.Europe:805|ms
+  - frontend.navtiming2_oversample.firstPaint.by_country.France:805|ms
+  - frontend.painttiming_group.group1:1|c

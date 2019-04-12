@@ -129,11 +129,13 @@ class NavTiming(object):
             'US': 'United States',   # ~22/min
         }
 
-        self.save_by_wiki_whitelist = {
+        # The list of wikis in the groups is non-exhaustive
+        self.group_mapping = {
             'commonswiki': 'group1',   # commons.wikimedia.org
             'enwiktionary': 'group1',  # en.wiktionary.org
             'frwiktionary': 'group1',  # fr.wiktionary.org
             'wikidatawiki': 'group1',  # www.wikidata.org
+            'cawiki': 'group1',        # ca.wikipedia.org
             'enwiki': 'group2',        # en.wikipedia.org
             'frwiki': 'group2',        # fr.wikipedia.org
             'ruwiki': 'group2',        # ru.wikipedia.org
@@ -363,10 +365,9 @@ class NavTiming(object):
         duration = event.get('saveTiming')
         if duration is not None:
             yield self.make_stat('mw.performance.save', duration)
-            if wiki in self.save_by_wiki_whitelist:
-                group = self.save_by_wiki_whitelist[wiki]
-                yield self.make_stat('mw.performance.save_by_group',
-                                     group.replace('.', '_'), duration)
+            if wiki in self.group_mapping:
+                group = self.group_mapping[wiki]
+                yield self.make_stat('mw.performance.save_by_group', group, duration)
             else:
                 yield self.make_stat('mw.performance.save_by_group.other', duration)
 
@@ -386,6 +387,7 @@ class NavTiming(object):
 
     def handle_paint_timing(self, meta):
         event = meta['event']
+        wiki = meta['wiki']
 
         try:
             site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
@@ -417,6 +419,10 @@ class NavTiming(object):
                 metric,
                 value):
             yield stat
+
+        if wiki in self.group_mapping:
+            group = self.group_mapping[wiki]
+            yield self.make_count('frontend.painttiming_group', group)
 
     def get_navigation_timing_context(self, meta):
         event = meta['event']
@@ -491,6 +497,7 @@ class NavTiming(object):
 
     def handle_navigation_timing(self, meta):
         event = meta['event']
+        wiki = meta['wiki']
 
         if not self.is_compliant(event, meta['userAgent']):
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
@@ -567,6 +574,10 @@ class NavTiming(object):
                     value
                 ):
                     yield stat
+
+            if wiki in self.group_mapping:
+                group = self.group_mapping[wiki]
+                yield self.make_count('frontend.navtiming_group', group)
 
     def return_commit_callback(self):
         # Closure so that log config carries over
