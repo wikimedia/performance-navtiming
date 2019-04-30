@@ -612,13 +612,18 @@ class NavTiming(object):
                 )
 
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
-                # Force the consumer to go to the most recent message.  Need to
-                # assign partitions manually, see https://github.com/dpkp/kafka-python/issues/601
+
+                # This is a quirk of the library where this call triggers actually fetching
+                # the metadata, whereas partitions_for_topic doesn't
+                # https://github.com/dpkp/kafka-python/issues/1774
+                consumer.topics()
+
                 assignments = []
                 for topic in kafka_topics:
                     self.log.info('Fetching partitions for topic: {}'.format(topic))
                     partitions = consumer.partitions_for_topic(topic)
 
+                    # Safety net in case partitions_for_topic failed, but shouldn't happen whend primed with .topics()
                     if partitions is None:
                         self.log.info('No partitions found for topic: {}, defaulting to partition 0'.format(topic))
                         assignments.append(TopicPartition(topic, 0))
