@@ -618,8 +618,13 @@ class NavTiming(object):
                 for topic in kafka_topics:
                     self.log.info('Fetching partitions for topic: {}'.format(topic))
                     partitions = consumer.partitions_for_topic(topic)
-                    for p in partitions:
-                        assignments.append(TopicPartition(topic, p))
+
+                    if partitions is None:
+                        self.log.info('No partitions found for topic: {}, defaulting to partition 0'.format(topic))
+                        assignments.append(TopicPartition(topic, 0))
+                    else:
+                        for p in partitions:
+                            assignments.append(TopicPartition(topic, p))
 
                 self.log.info('Assigning partitions: {}'.format(assignments))
                 consumer.assign(assignments)
