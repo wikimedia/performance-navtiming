@@ -616,9 +616,12 @@ class NavTiming(object):
                 # assign partitions manually, see https://github.com/dpkp/kafka-python/issues/601
                 assignments = []
                 for topic in kafka_topics:
+                    self.log.info('Fetching partitions for topic: {}'.format(topic))
                     partitions = consumer.partitions_for_topic(topic)
                     for p in partitions:
                         assignments.append(TopicPartition(topic, p))
+
+                self.log.info('Assigning partitions: {}'.format(assignments))
                 consumer.assign(assignments)
                 consumer.seek_to_end()
 
