@@ -54,6 +54,7 @@ class NavTiming(object):
             'NavigationTiming': self.handle_navigation_timing,
             'SaveTiming': self.handle_save_timing,
             'QuickSurveysResponses': self.handle_quick_surveys_responses,
+            'QuickSurveyInitiation': self.handle_quick_survey_initiation,
             'PaintTiming': self.handle_paint_timing
         }
 
@@ -384,6 +385,17 @@ class NavTiming(object):
         response = surveyResponseValue[48:]
 
         yield self.make_count('performance.survey', wiki, response)
+
+    def handle_quick_survey_initiation(self, meta):
+        event = meta['event']
+        wiki = meta['wiki']
+        surveyCodeName = event.get('surveyCodeName')
+        eventName = event.get('eventName')
+
+        if surveyCodeName != 'perceived-performance-survey' or not wiki or not eventName:
+            return
+
+        yield self.make_count('performance.survey_initiation', wiki, eventName)
 
     def handle_paint_timing(self, meta):
         event = meta['event']
