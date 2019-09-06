@@ -104,15 +104,24 @@ class NavTiming(object):
             for country in countries:
                 self.iso_3166_to_continent[country] = continent
 
-        # Shortlist of ISO 3166-1 country codes to create dedicated Graphite metrics
-        # for from Navigation Timing. This list is based on the top 40 most populous
-        # countries as of 1 January 2016 (83% of the world's population living in
-        # these countries) reduced to only those countries from which at least 5
-        # Navigation Timing events are received on average every minute.
-        #
+        # For this shortlist of ISO ISO 3166-1 country codes, we create an additional
+        # copy of the Navigation Timing data in Graphite by country.
         # <https://grafana.wikimedia.org/dashboard/db/navtiming-count-by-country>
         #
-        # This is for publicly aggregated time series published via Graphite.
+        # This list is based on the top 40 most populous countries.
+        # <https://en.wikipedia.org/wiki/List_of_countries_by_population_%28United_Nations%29>
+        #
+        # 1. China, 2. India, 3. United States, 4. Indonesia, 5. Pakistan, 6. Brazil, 7. Nigeria,
+        # 8. Bangladesh, 9. Russia, 10. Mexico, 11. Japan, 12. Ethiopia, 13. Philippines,
+        # 14. Egypt, 15. Vietnam, 16. Democratic Republic of the Congo, 17. Germany, 18. Turkey,
+        # 19. Iran, 20. Thailand, 21. United Kingdom, 22. France, 23. Italy, 24. South Africa,
+        # 25. Tanzania, 26. Myanmar, 27. Kenya, 28. South Korea, 29. Colombia, 30. Spain,
+        # 31. Argentina, 32. Uganda, 33. Ukraine, 34. Algeria, 35. Sudan, 36. Iraq,
+        # 37. Afghanistan, 38. Poland, 39. Canada, 40. Morocco
+        #
+        # This list is reduced to those from which enough NavigationTiming events are received
+        # for a per-minute aggregate and percectile to be useful. Currently cut-off is set at
+        # 2.4% from a 24 hour window, where 2.4% maps to 4-7 page view samples per minute.
         #
         # The original unfiltered data from EventLogging is privately available
         # via the Analytics infrastructure (EventLogging DB).
@@ -120,14 +129,19 @@ class NavTiming(object):
         # - <https://wikitech.wikimedia.org/wiki/EventLogging#Accessing_data>
         # - <https://wikitech.wikimedia.org/wiki/Analytics/Data_access#Access_Groups>
         self.iso_3166_whitelist = {
-            'DE': 'Germany',         # ~9/min
-            'FR': 'France',          # ~6/min
-            'GB': 'United Kingdom',  # ~8/min
-            'IN': 'India',           # ~5/min
-            'IT': 'Italy',           # ~6/min
-            'JP': 'Japan',           # ~12/min
-            'RU': 'Russia',          # ~6/min
-            'US': 'United States',   # ~22/min
+            # Annotated based on results from this Hive query:
+            # > SELECT COUNT(*), event.originCountry FROM navigationtiming WHERE year=2019
+            #   AND month=8 AND day=4 AND event.isOversample=0 GROUP BY event.originCountry;
+            'BR': 'Brazil',          # 9. BR 2.4%
+            'CA': 'Canada',          # 10. CA 2.4%
+            'DE': 'Germany',         # 4. DE 5.6%
+            'FR': 'France',          # 6. FR 3.9%
+            'GB': 'United Kingdom',  # 3. GB 4.7%
+            'IN': 'India',           # 5. IN 5.4%
+            'IT': 'Italy',           # 7. IT 3.7%
+            'JP': 'Japan',           # 2. JP 8.9%
+            'RU': 'Russia',          # 8. RU 2.9%
+            'US': 'United States',   # 1. US 20.7%
         }
 
         # The list of wikis in the groups is non-exhaustive
