@@ -11,6 +11,38 @@ import logging
 import socket
 import time
 
+from prometheus_client import start_http_server, Counter, Gauge
+
+namespace = 'webperf'
+COUNTERS = {}
+
+# Generic
+COUNTERS['consumed_messages'] = \
+    Counter('consumed_messages', 'Messages consumed from Kafka', namespace=namespace)
+COUNTERS['handled_messages'] = \
+    Counter('handled_messages', 'Messages handled', ['schema'], namespace=namespace)
+COUNTERS['latest_handled_time_seconds'] = \
+    Gauge('latest_handled_time_seconds', 'UNIX timestamp of most recent message', ['schema'], namespace=namespace)
+COUNTERS['errors'] = \
+    Counter('errors', 'Unhandled exceptions while processing', namespace=namespace)
+
+# Handlers
+COUNTERS['performance_survey_responses'] = \
+    Counter('performance_survey_responses', 'Performance survey responses',
+            ['wiki', 'response'], namespace=namespace)
+COUNTERS['performance_survey_initiations'] = \
+    Counter('performance_survey_initiations', 'Performance survey initiations',
+            ['wiki', 'event'], namespace=namespace)
+COUNTERS['painttiming_invalid_events'] = \
+    Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
+            ['group'], namespace=namespace)
+COUNTERS['navtiming_invalid_events'] = \
+    Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
+            ['group'], namespace=namespace)
+COUNTERS['savetiming_invalid_events'] = \
+    Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
+            ['group'], namespace=namespace)
+
 
 class NavTiming(object):
     def __init__(self, brokers=['127.0.0.1:9092'], consumer_group='navtiming',
@@ -155,6 +187,9 @@ class NavTiming(object):
             'frwiki': 'group2',        # fr.wikipedia.org
             'ruwiki': 'group2',        # ru.wikipedia.org
         }
+
+    def wiki_to_group(self, wiki):
+        return self.group_mapping.get(wiki, 'other')
 
     def is_master(self):
         if self.etcd is None:
@@ -378,13 +413,12 @@ class NavTiming(object):
         event = meta['event']
         wiki = meta['wiki']
         duration = event.get('saveTiming')
+        group = self.wiki_to_group(wiki)
         if duration is not None:
             yield self.make_stat('mw.performance.save', duration)
-            if wiki in self.group_mapping:
-                group = self.group_mapping[wiki]
-                yield self.make_stat('mw.performance.save_by_group', group, duration)
-            else:
-                yield self.make_stat('mw.performance.save_by_group.other', duration)
+            yield self.make_stat('mw.performance.save_by_group', group, duration)
+        else:
+            COUNTERS['savetiming_invalid_events'].labels(group).inc()
 
     def handle_quick_surveys_responses(self, meta):
         event = meta['event']
@@ -398,6 +432,8 @@ class NavTiming(object):
         # Example: ext-quicksurveys-example-internal-survey-answer-neutral
         response = surveyResponseValue[48:]
 
+        COUNTERS['performance_survey_responses'].labels(wiki, response).inc()
+
         yield self.make_count('performance.survey', wiki, response)
 
     def handle_quick_survey_initiation(self, meta):
@@ -409,11 +445,14 @@ class NavTiming(object):
         if surveyCodeName != 'perceived-performance-survey' or not wiki or not eventName:
             return
 
+        COUNTERS['performance_survey_initiations'].labels(wiki, eventName).inc()
+
         yield self.make_count('performance.survey_initiation', wiki, eventName)
 
     def handle_paint_timing(self, meta):
         event = meta['event']
         wiki = meta['wiki']
+        group = self.wiki_to_group(wiki)
 
         try:
             site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
@@ -425,12 +464,14 @@ class NavTiming(object):
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
         else:
+            COUNTERS['painttiming_invalid_events'].labels(group).inc()
             yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
             return
 
         value = event['startTime']
 
         if not self.is_sane_navtiming2(value):
+            COUNTERS['painttiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.painttiming_discard', 'isSane')
             return
 
@@ -446,9 +487,7 @@ class NavTiming(object):
                 value):
             yield stat
 
-        if wiki in self.group_mapping:
-            group = self.group_mapping[wiki]
-            yield self.make_count('frontend.painttiming_group', group)
+        yield self.make_count('frontend.painttiming_group', group)
 
     def get_navigation_timing_context(self, meta):
         event = meta['event']
@@ -524,8 +563,10 @@ class NavTiming(object):
     def handle_navigation_timing(self, meta):
         event = meta['event']
         wiki = meta['wiki']
+        group = self.wiki_to_group(wiki)
 
         if not self.is_compliant(event, meta['userAgent']):
+            COUNTERS['navtiming_invalid_events'].labels(group).inc()
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
@@ -586,6 +627,7 @@ class NavTiming(object):
 
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
+            COUNTERS['navtiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.navtiming_discard', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
@@ -601,9 +643,7 @@ class NavTiming(object):
                 ):
                     yield stat
 
-            if wiki in self.group_mapping:
-                group = self.group_mapping[wiki]
-                yield self.make_count('frontend.navtiming_group', group)
+            yield self.make_count('frontend.navtiming_group', group)
 
     def return_commit_callback(self):
         # Closure so that log config carries over
@@ -661,7 +701,7 @@ class NavTiming(object):
                 consumer.assign(assignments)
                 consumer.seek_to_end()
 
-                self.log.info('Starting NavTiming Kafka consumer.')
+                self.log.info('Starting NavTiming Kafka consumer')
 
                 for message in consumer:
                     # Check whether we should be running
@@ -671,10 +711,13 @@ class NavTiming(object):
                         if consumer is not None:
                             consumer.close()
                         break
+                    COUNTERS['consumed_messages'].inc()
                     meta = json.loads(message.value)
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
                         if f is not None:
+                            COUNTERS['handled_messages'].labels(meta['schema']).inc()
+                            COUNTERS['latest_handled_time_seconds'].labels(meta['schema']).set_to_current_time()
                             for stat in f(meta):
                                 self.dispatch_stat(stat)
             except KeyboardInterrupt:
@@ -682,6 +725,7 @@ class NavTiming(object):
                 consumer.close()
                 break
             except Exception:
+                COUNTERS['errors'].inc()
                 self.log.exception('Unhandled exception in main loop, restarting consumer')
 
 
@@ -705,6 +749,10 @@ def main(cluster=None, config=None):
     ap.add_argument('--statsd-port',
                     default=int(parsed_configs.get('statsd_port', 8125)),
                     type=int)
+    ap.add_argument('--listen',
+                    default=parsed_configs.get('listen', ':9230'),
+                    type=str,
+                    help='Expose Prometheus metrics on this address')
     ap.add_argument('--datacenter',
                     required=False,
                     default=cluster,
@@ -750,6 +798,10 @@ def main(cluster=None, config=None):
                    etcd_refresh=args.etcd_refresh,
                    verbose=args.verbose,
                    dry_run=args.dry_run)
+
+    metrics_address, metrics_port = args.listen.split(':', 1)
+    start_http_server(int(metrics_port), addr=metrics_address)
+
     nt.run()
 
 

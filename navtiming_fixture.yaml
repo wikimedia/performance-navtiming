@@ -98,7 +98,9 @@ templates:
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
 Uncached page view from desktop with isOversample=false:
  input: {"event": {"action": "history", "connectEnd": 6, "connectStart": 6, "dnsLookup": 1, "domComplete": 1965, "domInteractive": 956, "fetchStart": 1, "isAnon": false, "isHiDPI": false, "isHttp2": true, "isOversample": false, "loadEventEnd": 1968, "loadEventStart": 1965, "mediaWikiLoadEnd": 1270, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "RS", "originRegion": "VO", "pageId": 1, "requestStart": 6, "responseEnd": 415, "responseStart": 380, "revId": 1, "unload": 4}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
- expect: *expected_uncached_desktop
+ expect:
+  - *expected_uncached_desktop
+  - frontend.navtiming_group.other:1|c
 
 # Sample from April 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
@@ -189,6 +191,7 @@ Cached page view from desktop:
   - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Chrome.60:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Chrome.all:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Africa:667|ms
+  - frontend.navtiming_group.other:1|c
 
 # Sample from September 2017
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
@@ -272,6 +275,7 @@ Mobile page view:
   - frontend.navtiming2.domInteractive.by_browser.Mobile_Safari.all:2936|ms
   - frontend.navtiming2.domInteractive.by_continent.Europe:2936|ms
   - frontend.navtiming2.domInteractive.by_country.Russia:2936|ms
+  - frontend.navtiming_group.other:1|c
 
 # Sample from September 2017 (added gaps)
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
@@ -370,6 +374,7 @@ View with timings above threshold (for navtiming):
   - frontend.navtiming2.gaps.by_browser.Edge.all:12|ms
   - frontend.navtiming2.gaps.by_continent.Europe:12|ms
   - frontend.navtiming2.gaps.by_country.France:12|ms
+  - frontend.navtiming_group.other:1|c
 
 # Sample from February 2018 (added 'isOversample', 'oversampleReason')
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17740037
@@ -449,6 +454,7 @@ Uncached page view from desktop that includes isOversample=true:
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.55:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.all:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_continent.Europe:955|ms
+  - frontend.navtiming_group.other:1|c
 
 # Sample from February 2018 (added 'isOversample', 'oversampleReason')
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17740037
@@ -463,6 +469,7 @@ Uncached page view from desktop that includes isOversample=true and oversampleRe
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.55:956|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.all:956|ms
   - frontend.navtiming2_oversample.domInteractive.by_country.XX:956|ms
+  - frontend.navtiming_group.other:1|c
 
 # Sample from April 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
@@ -519,10 +526,13 @@ PaintTiming:
   - frontend.navtiming2_oversample.firstPaint.by_country.France:805|ms
   - frontend.painttiming_group.group1:1|c
 
-QuickSurveyIinitiation:
+QuickSurveyInitiation:
  input:
   - {"event": {"beaconCapable":"true", "surveySessionToken":"1234af", "pageviewToken":"foobar", "surveyCodeName":"perceived-performance-survey", "eventName":"eligible", "performanceNow":3 }, "revision":19000009, "schema":"QuickSurveyInitiation", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
   - {"event": {"beaconCapable":"true", "surveySessionToken":"1234af", "pageviewToken":"foobar", "surveyCodeName":"perceived-performance-survey", "eventName":"impression", "performanceNow":3 }, "revision":19000009, "schema":"QuickSurveyInitiation", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  expect:
   - performance.survey_initiation.cawiki.eligible:1|c
   - performance.survey_initiation.cawiki.impression:1|c
+ metrics:
+   - ['webperf_performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'eligible'}, 1]
+   - ['webperf_performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'impression'}, 1]

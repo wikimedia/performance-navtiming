@@ -6,6 +6,8 @@ import os
 
 import navtiming
 
+from prometheus_client import REGISTRY
+
 
 # ##### Tests ######
 # To run:
@@ -75,6 +77,12 @@ class TestNavTiming(unittest.TestCase):
                     Test fails under Python3
                     """
                     pass
+
+                for metric in case.get('metrics', []):
+                    name, labels, value = metric
+                    self.assertEqual(
+                        REGISTRY.get_sample_value(name, labels),
+                        value)
 
     def test_is_compliant(self):
         event = {

@@ -15,9 +15,10 @@ setup(
         'navtiming'
     ],
     install_requires=[
-        'pyyaml',
         'kafka-python',
-        'python-etcd'
+        'prometheus_client',
+        'python-etcd',
+        'pyyaml',
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

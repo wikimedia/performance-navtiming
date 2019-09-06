@@ -1,3 +1,4 @@
-pyyaml
 kafka-python
+prometheus_client
 python-etcd
+pyyaml
