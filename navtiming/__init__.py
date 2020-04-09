@@ -11,7 +11,7 @@ import logging
 import socket
 import time
 
-from prometheus_client import start_http_server, Counter, Gauge
+from prometheus_client import start_http_server, Counter, Gauge, Histogram
 
 namespace = 'webperf'
 COUNTERS = {}
@@ -45,6 +45,10 @@ COUNTERS['navtiming_invalid_events'] = \
 COUNTERS['savetiming_invalid_events'] = \
     Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
             ['group'], namespace=namespace)
+COUNTERS['firstinputdelay_seconds'] = \
+    Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
+              ['group', 'site', 'auth', 'ua_family', 'ua_version', 'continent', 'country_name', 'is_oversample'],
+              namespace=namespace)
 
 
 class NavTiming(object):
@@ -498,12 +502,24 @@ class NavTiming(object):
         wiki = meta['wiki']
         group = self.wiki_to_group(wiki)
 
+        try:
+            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+        except Exception:
+            return
+
+        # us is a (family, version) tuple
+        ua_family, ua_version = ua
+
         fid = event['FID']
 
         if not self.is_sane_navtiming2(fid):
             COUNTERS['firstinputtiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.firstinputtiming_discard', 'isSane')
             return
+
+        COUNTERS['firstinputdelay_seconds'].labels(
+            group, site, auth, ua_family, ua_version, continent, country_name, is_oversample
+        ).observe(fid / 1000.0)
 
         yield self.make_stat('frontend.firstinputtiming.fid', fid)
         yield self.make_stat('frontend.firstinputtiming.fid_by_group', group, fid)
@@ -521,8 +537,8 @@ class NavTiming(object):
         auth = 'anonymous' if event.get('isAnon') else 'authenticated'
 
         country_code = event.get('originCountry')
-        continent = self.iso_3166_to_continent.get(country_code)
-        country_name = self.iso_3166_whitelist.get(country_code)
+        continent = self.iso_3166_to_continent.get(country_code, 'other')
+        country_name = self.iso_3166_whitelist.get(country_code, 'other')
 
         # Handle oversampling
         if 'isOversample' in event and event['isOversample']:
@@ -569,15 +585,10 @@ class NavTiming(object):
         yield self.make_stat(prefix, metric, site, auth, value)
         yield self.make_stat(prefix, metric, site, 'overall', value)
         yield self.make_stat(prefix, metric, 'overall', value)
-
         yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
         yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
-
-        if continent is not None:
-            yield self.make_stat(prefix, metric, 'by_continent', continent, value)
-
-        if country_name is not None:
-            yield self.make_stat(prefix, metric, 'by_country', country_name, value)
+        yield self.make_stat(prefix, metric, 'by_continent', continent, value)
+        yield self.make_stat(prefix, metric, 'by_country', country_name, value)
 
     def handle_navigation_timing(self, meta):
         event = meta['event']

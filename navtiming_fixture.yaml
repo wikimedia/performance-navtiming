@@ -21,78 +21,91 @@ templates:
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.55:1269|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.all:1269|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Europe:1269|ms
+    - frontend.navtiming2.mediaWikiLoadEnd.by_country.other:1269|ms
     - frontend.navtiming2.onLoad.desktop.authenticated:3|ms
     - frontend.navtiming2.onLoad.desktop.overall:3|ms
     - frontend.navtiming2.onLoad.overall:3|ms
     - frontend.navtiming2.onLoad.by_browser.Firefox.55:3|ms
     - frontend.navtiming2.onLoad.by_browser.Firefox.all:3|ms
     - frontend.navtiming2.onLoad.by_continent.Europe:3|ms
+    - frontend.navtiming2.onLoad.by_country.other:3|ms
     - frontend.navtiming2.dns.desktop.authenticated:1|ms
     - frontend.navtiming2.dns.desktop.overall:1|ms
     - frontend.navtiming2.dns.overall:1|ms
     - frontend.navtiming2.dns.by_browser.Firefox.55:1|ms
     - frontend.navtiming2.dns.by_browser.Firefox.all:1|ms
     - frontend.navtiming2.dns.by_continent.Europe:1|ms
+    - frontend.navtiming2.dns.by_country.other:1|ms
     - frontend.navtiming2.unload.desktop.authenticated:4|ms
     - frontend.navtiming2.unload.desktop.overall:4|ms
     - frontend.navtiming2.unload.overall:4|ms
     - frontend.navtiming2.unload.by_browser.Firefox.55:4|ms
     - frontend.navtiming2.unload.by_browser.Firefox.all:4|ms
     - frontend.navtiming2.unload.by_continent.Europe:4|ms
+    - frontend.navtiming2.unload.by_country.other:4|ms
     - frontend.navtiming2.processing.desktop.authenticated:1550|ms
     - frontend.navtiming2.processing.desktop.overall:1550|ms
     - frontend.navtiming2.processing.overall:1550|ms
     - frontend.navtiming2.processing.by_browser.Firefox.55:1550|ms
     - frontend.navtiming2.processing.by_browser.Firefox.all:1550|ms
     - frontend.navtiming2.processing.by_continent.Europe:1550|ms
+    - frontend.navtiming2.processing.by_country.other:1550|ms
     - frontend.navtiming2.request.desktop.authenticated:374|ms
     - frontend.navtiming2.request.desktop.overall:374|ms
     - frontend.navtiming2.request.overall:374|ms
     - frontend.navtiming2.request.by_browser.Firefox.55:374|ms
     - frontend.navtiming2.request.by_browser.Firefox.all:374|ms
     - frontend.navtiming2.request.by_continent.Europe:374|ms
+    - frontend.navtiming2.request.by_country.other:374|ms
     - frontend.navtiming2.tcp.desktop.authenticated:0|ms
     - frontend.navtiming2.tcp.desktop.overall:0|ms
     - frontend.navtiming2.tcp.overall:0|ms
     - frontend.navtiming2.tcp.by_browser.Firefox.55:0|ms
     - frontend.navtiming2.tcp.by_browser.Firefox.all:0|ms
     - frontend.navtiming2.tcp.by_continent.Europe:0|ms
+    - frontend.navtiming2.tcp.by_country.other:0|ms
     - frontend.navtiming2.loadEventEnd.desktop.authenticated:1967|ms
     - frontend.navtiming2.loadEventEnd.desktop.overall:1967|ms
     - frontend.navtiming2.loadEventEnd.overall:1967|ms
     - frontend.navtiming2.loadEventEnd.by_browser.Firefox.55:1967|ms
     - frontend.navtiming2.loadEventEnd.by_browser.Firefox.all:1967|ms
     - frontend.navtiming2.loadEventEnd.by_continent.Europe:1967|ms
+    - frontend.navtiming2.loadEventEnd.by_country.other:1967|ms
     - frontend.navtiming2.loadEventStart.desktop.authenticated:1964|ms
     - frontend.navtiming2.loadEventStart.desktop.overall:1964|ms
     - frontend.navtiming2.loadEventStart.overall:1964|ms
     - frontend.navtiming2.loadEventStart.by_browser.Firefox.55:1964|ms
     - frontend.navtiming2.loadEventStart.by_browser.Firefox.all:1964|ms
     - frontend.navtiming2.loadEventStart.by_continent.Europe:1964|ms
+    - frontend.navtiming2.loadEventStart.by_country.other:1964|ms
     - frontend.navtiming2.response.desktop.authenticated:35|ms
     - frontend.navtiming2.response.desktop.overall:35|ms
     - frontend.navtiming2.response.overall:35|ms
     - frontend.navtiming2.response.by_browser.Firefox.55:35|ms
     - frontend.navtiming2.response.by_browser.Firefox.all:35|ms
     - frontend.navtiming2.response.by_continent.Europe:35|ms
+    - frontend.navtiming2.response.by_country.other:35|ms
     - frontend.navtiming2.domComplete.desktop.authenticated:1964|ms
     - frontend.navtiming2.domComplete.desktop.overall:1964|ms
     - frontend.navtiming2.domComplete.overall:1964|ms
     - frontend.navtiming2.domComplete.by_browser.Firefox.55:1964|ms
     - frontend.navtiming2.domComplete.by_browser.Firefox.all:1964|ms
     - frontend.navtiming2.domComplete.by_continent.Europe:1964|ms
+    - frontend.navtiming2.domComplete.by_country.other:1964|ms
     - frontend.navtiming2.responseStart.desktop.authenticated:379|ms
     - frontend.navtiming2.responseStart.desktop.overall:379|ms
     - frontend.navtiming2.responseStart.overall:379|ms
     - frontend.navtiming2.responseStart.by_browser.Firefox.55:379|ms
     - frontend.navtiming2.responseStart.by_browser.Firefox.all:379|ms
     - frontend.navtiming2.responseStart.by_continent.Europe:379|ms
+    - frontend.navtiming2.responseStart.by_country.other:379|ms
     - frontend.navtiming2.domInteractive.desktop.authenticated:955|ms
     - frontend.navtiming2.domInteractive.desktop.overall:955|ms
     - frontend.navtiming2.domInteractive.overall:955|ms
     - frontend.navtiming2.domInteractive.by_browser.Firefox.55:955|ms
     - frontend.navtiming2.domInteractive.by_browser.Firefox.all:955|ms
     - frontend.navtiming2.domInteractive.by_continent.Europe:955|ms
+    - frontend.navtiming2.domInteractive.by_country.other:955|ms
 
 # Sample from April 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
@@ -113,84 +126,98 @@ Cached page view from desktop:
   - frontend.navtiming2.onLoad.by_browser.Chrome.60:2|ms
   - frontend.navtiming2.onLoad.by_browser.Chrome.all:2|ms
   - frontend.navtiming2.onLoad.by_continent.Africa:2|ms
+  - frontend.navtiming2.onLoad.by_country.other:2|ms
   - frontend.navtiming2.dns.desktop.anonymous:0|ms
   - frontend.navtiming2.dns.desktop.overall:0|ms
   - frontend.navtiming2.dns.overall:0|ms
   - frontend.navtiming2.dns.by_browser.Chrome.60:0|ms
   - frontend.navtiming2.dns.by_browser.Chrome.all:0|ms
   - frontend.navtiming2.dns.by_continent.Africa:0|ms
+  - frontend.navtiming2.dns.by_country.other:0|ms
   - frontend.navtiming2.unload.desktop.anonymous:0|ms
   - frontend.navtiming2.unload.desktop.overall:0|ms
   - frontend.navtiming2.unload.overall:0|ms
   - frontend.navtiming2.unload.by_browser.Chrome.60:0|ms
   - frontend.navtiming2.unload.by_browser.Chrome.all:0|ms
   - frontend.navtiming2.unload.by_continent.Africa:0|ms
+  - frontend.navtiming2.unload.by_country.other:0|ms
   - frontend.navtiming2.request.desktop.anonymous:344|ms
   - frontend.navtiming2.request.desktop.overall:344|ms
   - frontend.navtiming2.request.overall:344|ms
   - frontend.navtiming2.request.by_browser.Chrome.60:344|ms
   - frontend.navtiming2.request.by_browser.Chrome.all:344|ms
   - frontend.navtiming2.request.by_continent.Africa:344|ms
+  - frontend.navtiming2.request.by_country.other:344|ms
   - frontend.navtiming2.processing.desktop.anonymous:828|ms
   - frontend.navtiming2.processing.desktop.overall:828|ms
   - frontend.navtiming2.processing.overall:828|ms
   - frontend.navtiming2.processing.by_browser.Chrome.60:828|ms
   - frontend.navtiming2.processing.by_browser.Chrome.all:828|ms
   - frontend.navtiming2.processing.by_continent.Africa:828|ms
+  - frontend.navtiming2.processing.by_country.other:828|ms
   - frontend.navtiming2.firstPaint.desktop.anonymous:635|ms
   - frontend.navtiming2.firstPaint.desktop.overall:635|ms
   - frontend.navtiming2.firstPaint.overall:635|ms
   - frontend.navtiming2.firstPaint.by_browser.Chrome.60:635|ms
   - frontend.navtiming2.firstPaint.by_browser.Chrome.all:635|ms
   - frontend.navtiming2.firstPaint.by_continent.Africa:635|ms
+  - frontend.navtiming2.firstPaint.by_country.other:635|ms
   - frontend.navtiming2.tcp.desktop.anonymous:0|ms
   - frontend.navtiming2.tcp.desktop.overall:0|ms
   - frontend.navtiming2.tcp.overall:0|ms
   - frontend.navtiming2.tcp.by_browser.Chrome.60:0|ms
   - frontend.navtiming2.tcp.by_browser.Chrome.all:0|ms
   - frontend.navtiming2.tcp.by_continent.Africa:0|ms
+  - frontend.navtiming2.tcp.by_country.other:0|ms
   - frontend.navtiming2.loadEventEnd.desktop.anonymous:1203|ms
   - frontend.navtiming2.loadEventEnd.desktop.overall:1203|ms
   - frontend.navtiming2.loadEventEnd.overall:1203|ms
   - frontend.navtiming2.loadEventEnd.by_browser.Chrome.60:1203|ms
   - frontend.navtiming2.loadEventEnd.by_browser.Chrome.all:1203|ms
   - frontend.navtiming2.loadEventEnd.by_continent.Africa:1203|ms
+  - frontend.navtiming2.loadEventEnd.by_country.other:1203|ms
   - frontend.navtiming2.loadEventStart.desktop.anonymous:1201|ms
   - frontend.navtiming2.loadEventStart.desktop.overall:1201|ms
   - frontend.navtiming2.loadEventStart.overall:1201|ms
   - frontend.navtiming2.loadEventStart.by_browser.Chrome.60:1201|ms
   - frontend.navtiming2.loadEventStart.by_browser.Chrome.all:1201|ms
   - frontend.navtiming2.loadEventStart.by_continent.Africa:1201|ms
+  - frontend.navtiming2.loadEventStart.by_country.other:1201|ms
   - frontend.navtiming2.response.desktop.anonymous:13|ms
   - frontend.navtiming2.response.desktop.overall:13|ms
   - frontend.navtiming2.response.overall:13|ms
   - frontend.navtiming2.response.by_browser.Chrome.60:13|ms
   - frontend.navtiming2.response.by_browser.Chrome.all:13|ms
   - frontend.navtiming2.response.by_continent.Africa:13|ms
+  - frontend.navtiming2.response.by_country.other:13|ms
   - frontend.navtiming2.domComplete.desktop.anonymous:1201|ms
   - frontend.navtiming2.domComplete.desktop.overall:1201|ms
   - frontend.navtiming2.domComplete.overall:1201|ms
   - frontend.navtiming2.domComplete.by_browser.Chrome.60:1201|ms
   - frontend.navtiming2.domComplete.by_browser.Chrome.all:1201|ms
   - frontend.navtiming2.domComplete.by_continent.Africa:1201|ms
+  - frontend.navtiming2.domComplete.by_country.other:1201|ms
   - frontend.navtiming2.responseStart.desktop.anonymous:360|ms
   - frontend.navtiming2.responseStart.desktop.overall:360|ms
   - frontend.navtiming2.responseStart.overall:360|ms
   - frontend.navtiming2.responseStart.by_browser.Chrome.60:360|ms
   - frontend.navtiming2.responseStart.by_browser.Chrome.all:360|ms
   - frontend.navtiming2.responseStart.by_continent.Africa:360|ms
+  - frontend.navtiming2.responseStart.by_country.other:360|ms
   - frontend.navtiming2.domInteractive.desktop.anonymous:576|ms
   - frontend.navtiming2.domInteractive.desktop.overall:576|ms
   - frontend.navtiming2.domInteractive.overall:576|ms
   - frontend.navtiming2.domInteractive.by_browser.Chrome.60:576|ms
   - frontend.navtiming2.domInteractive.by_browser.Chrome.all:576|ms
   - frontend.navtiming2.domInteractive.by_continent.Africa:576|ms
+  - frontend.navtiming2.domInteractive.by_country.other:576|ms
   - frontend.navtiming2.mediaWikiLoadEnd.desktop.anonymous:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.desktop.overall:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.overall:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Chrome.60:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Chrome.all:667|ms
   - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Africa:667|ms
+  - frontend.navtiming2.mediaWikiLoadEnd.by_country.other:667|ms
   - frontend.navtiming_group.other:1|c
 
 # Sample from September 2017
@@ -388,72 +415,84 @@ Uncached page view from desktop that includes isOversample=true:
   - frontend.navtiming2_oversample.onLoad.by_browser.Firefox.55:3|ms
   - frontend.navtiming2_oversample.onLoad.by_browser.Firefox.all:3|ms
   - frontend.navtiming2_oversample.onLoad.by_continent.Europe:3|ms
+  - frontend.navtiming2_oversample.onLoad.by_country.other:3|ms
   - frontend.navtiming2_oversample.dns.desktop.authenticated:1|ms
   - frontend.navtiming2_oversample.dns.desktop.overall:1|ms
   - frontend.navtiming2_oversample.dns.overall:1|ms
   - frontend.navtiming2_oversample.dns.by_browser.Firefox.55:1|ms
   - frontend.navtiming2_oversample.dns.by_browser.Firefox.all:1|ms
   - frontend.navtiming2_oversample.dns.by_continent.Europe:1|ms
+  - frontend.navtiming2_oversample.dns.by_country.other:1|ms
   - frontend.navtiming2_oversample.unload.desktop.authenticated:4|ms
   - frontend.navtiming2_oversample.unload.desktop.overall:4|ms
   - frontend.navtiming2_oversample.unload.overall:4|ms
   - frontend.navtiming2_oversample.unload.by_browser.Firefox.55:4|ms
   - frontend.navtiming2_oversample.unload.by_browser.Firefox.all:4|ms
   - frontend.navtiming2_oversample.unload.by_continent.Europe:4|ms
+  - frontend.navtiming2_oversample.unload.by_country.other:4|ms
   - frontend.navtiming2_oversample.processing.desktop.authenticated:1550|ms
   - frontend.navtiming2_oversample.processing.desktop.overall:1550|ms
   - frontend.navtiming2_oversample.processing.overall:1550|ms
   - frontend.navtiming2_oversample.processing.by_browser.Firefox.55:1550|ms
   - frontend.navtiming2_oversample.processing.by_browser.Firefox.all:1550|ms
   - frontend.navtiming2_oversample.processing.by_continent.Europe:1550|ms
+  - frontend.navtiming2_oversample.processing.by_country.other:1550|ms
   - frontend.navtiming2_oversample.request.desktop.authenticated:374|ms
   - frontend.navtiming2_oversample.request.desktop.overall:374|ms
   - frontend.navtiming2_oversample.request.overall:374|ms
   - frontend.navtiming2_oversample.request.by_browser.Firefox.55:374|ms
   - frontend.navtiming2_oversample.request.by_browser.Firefox.all:374|ms
   - frontend.navtiming2_oversample.request.by_continent.Europe:374|ms
+  - frontend.navtiming2_oversample.request.by_country.other:374|ms
   - frontend.navtiming2_oversample.tcp.desktop.authenticated:0|ms
   - frontend.navtiming2_oversample.tcp.desktop.overall:0|ms
   - frontend.navtiming2_oversample.tcp.overall:0|ms
   - frontend.navtiming2_oversample.tcp.by_browser.Firefox.55:0|ms
   - frontend.navtiming2_oversample.tcp.by_browser.Firefox.all:0|ms
   - frontend.navtiming2_oversample.tcp.by_continent.Europe:0|ms
+  - frontend.navtiming2_oversample.tcp.by_country.other:0|ms
   - frontend.navtiming2_oversample.loadEventEnd.desktop.authenticated:1967|ms
   - frontend.navtiming2_oversample.loadEventEnd.desktop.overall:1967|ms
   - frontend.navtiming2_oversample.loadEventEnd.overall:1967|ms
   - frontend.navtiming2_oversample.loadEventEnd.by_browser.Firefox.55:1967|ms
   - frontend.navtiming2_oversample.loadEventEnd.by_browser.Firefox.all:1967|ms
   - frontend.navtiming2_oversample.loadEventEnd.by_continent.Europe:1967|ms
+  - frontend.navtiming2_oversample.loadEventEnd.by_country.other:1967|ms
   - frontend.navtiming2_oversample.loadEventStart.desktop.authenticated:1964|ms
   - frontend.navtiming2_oversample.loadEventStart.desktop.overall:1964|ms
   - frontend.navtiming2_oversample.loadEventStart.overall:1964|ms
   - frontend.navtiming2_oversample.loadEventStart.by_browser.Firefox.55:1964|ms
   - frontend.navtiming2_oversample.loadEventStart.by_browser.Firefox.all:1964|ms
   - frontend.navtiming2_oversample.loadEventStart.by_continent.Europe:1964|ms
+  - frontend.navtiming2_oversample.loadEventStart.by_country.other:1964|ms
   - frontend.navtiming2_oversample.response.desktop.authenticated:35|ms
   - frontend.navtiming2_oversample.response.desktop.overall:35|ms
   - frontend.navtiming2_oversample.response.overall:35|ms
   - frontend.navtiming2_oversample.response.by_browser.Firefox.55:35|ms
   - frontend.navtiming2_oversample.response.by_browser.Firefox.all:35|ms
   - frontend.navtiming2_oversample.response.by_continent.Europe:35|ms
+  - frontend.navtiming2_oversample.response.by_country.other:35|ms
   - frontend.navtiming2_oversample.domComplete.desktop.authenticated:1964|ms
   - frontend.navtiming2_oversample.domComplete.desktop.overall:1964|ms
   - frontend.navtiming2_oversample.domComplete.overall:1964|ms
   - frontend.navtiming2_oversample.domComplete.by_browser.Firefox.55:1964|ms
   - frontend.navtiming2_oversample.domComplete.by_browser.Firefox.all:1964|ms
   - frontend.navtiming2_oversample.domComplete.by_continent.Europe:1964|ms
+  - frontend.navtiming2_oversample.domComplete.by_country.other:1964|ms
   - frontend.navtiming2_oversample.responseStart.desktop.authenticated:379|ms
   - frontend.navtiming2_oversample.responseStart.desktop.overall:379|ms
   - frontend.navtiming2_oversample.responseStart.overall:379|ms
   - frontend.navtiming2_oversample.responseStart.by_browser.Firefox.55:379|ms
   - frontend.navtiming2_oversample.responseStart.by_browser.Firefox.all:379|ms
   - frontend.navtiming2_oversample.responseStart.by_continent.Europe:379|ms
+  - frontend.navtiming2_oversample.responseStart.by_country.other:379|ms
   - frontend.navtiming2_oversample.domInteractive.desktop.authenticated:955|ms
   - frontend.navtiming2_oversample.domInteractive.desktop.overall:955|ms
   - frontend.navtiming2_oversample.domInteractive.overall:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.55:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.all:955|ms
   - frontend.navtiming2_oversample.domInteractive.by_continent.Europe:955|ms
+  - frontend.navtiming2_oversample.domInteractive.by_country.other:955|ms
   - frontend.navtiming_group.other:1|c
 
 # Sample from February 2018 (added 'isOversample', 'oversampleReason')
@@ -469,6 +508,7 @@ Uncached page view from desktop that includes isOversample=true and oversampleRe
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.55:956|ms
   - frontend.navtiming2_oversample.domInteractive.by_browser.Firefox.all:956|ms
   - frontend.navtiming2_oversample.domInteractive.by_country.XX:956|ms
+  - frontend.navtiming2_oversample.domInteractive.by_continent.other:956|ms
   - frontend.navtiming_group.other:1|c
 
 # Sample from April 2018
@@ -482,6 +522,7 @@ Page view without NavTiming support:
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.55:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_browser.Firefox.all:1270|ms
     - frontend.navtiming2.mediaWikiLoadEnd.by_continent.Europe:1270|ms
+    - frontend.navtiming2.mediaWikiLoadEnd.by_country.other:1270|ms
     - frontend.navtiming_group.group1:1|c
 
 # Sample from September 2017, and July 2018
