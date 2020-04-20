@@ -47,7 +47,9 @@ COUNTERS['savetiming_invalid_events'] = \
             ['group'], namespace=namespace)
 COUNTERS['firstinputdelay_seconds'] = \
     Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
-              ['group', 'site', 'auth', 'ua_family', 'ua_version', 'continent', 'country_name', 'is_oversample'],
+              ['group', 'ua_family', 'ua_version'],
+              # Most observed FID values are between 1 and 100ms
+              buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
               namespace=namespace)
 
 
@@ -518,7 +520,7 @@ class NavTiming(object):
             return
 
         COUNTERS['firstinputdelay_seconds'].labels(
-            group, site, auth, ua_family, ua_version, continent, country_name, is_oversample
+            group, ua_family, ua_version
         ).observe(fid / 1000.0)
 
         yield self.make_stat('frontend.firstinputtiming.fid', fid)

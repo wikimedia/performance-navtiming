@@ -586,3 +586,9 @@ FirstInputTiming:
  expect:
   - frontend.firstinputtiming.fid:20|ms
   - frontend.firstinputtiming.fid_by_group.group1:20|ms
+ metrics:
+   - ['webperf_firstinputdelay_seconds_count', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
+   - ['webperf_firstinputdelay_seconds_sum', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.02]
+   - ['webperf_firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.005'}, 0]
+   - ['webperf_firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.01'}, 0]
+   - ['webperf_firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.025'}, 1]
