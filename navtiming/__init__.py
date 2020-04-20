@@ -51,6 +51,11 @@ COUNTERS['firstinputdelay_seconds'] = \
               # Most observed FID values are between 1 and 100ms
               buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
               namespace=namespace)
+COUNTERS['navtiming_responsestart_by_host_seconds'] = \
+    Histogram('navtiming_responsestart_by_host_seconds',
+              'Response Start data from NavigationTiming schema by dc and host',
+              ['dc', 'host'],
+              namespace=namespace)
 
 
 class NavTiming(object):
@@ -674,6 +679,15 @@ class NavTiming(object):
                     value
                 ):
                     yield stat
+
+                if metric == 'responseStart' and not is_oversample:
+                    try:
+                        dc, host, _ = meta['recvFrom'].split('.')
+                        COUNTERS['navtiming_responsestart_by_host_seconds'].labels(
+                            dc, host
+                        ).observe(value / 1000.0)
+                    except (KeyError, ValueError):
+                        pass
 
             yield self.make_count('frontend.navtiming_group', group)
 
