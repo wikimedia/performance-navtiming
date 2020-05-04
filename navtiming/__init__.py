@@ -682,7 +682,7 @@ class NavTiming(object):
 
                 if metric == 'responseStart' and not is_oversample:
                     try:
-                        dc, host, _ = meta['recvFrom'].split('.')
+                        host, dc, _ = meta['recvFrom'].split('.')
                         COUNTERS['navtiming_responsestart_by_host_seconds'].labels(
                             dc, host
                         ).observe(value / 1000.0)
