@@ -4,7 +4,7 @@ import os
 
 setup(
     name='navtiming',
-    version=1.0,
+    version=1.01,
     author='Ian Marlier',
     author_email='imarlier@wikimedia.org',
     url='https://wikitech.wikimedia.org/wiki/Webperf',
@@ -19,6 +19,7 @@ setup(
         'prometheus_client',
         'python-etcd',
         'pyyaml',
+        'ua-parser==0.10.0',
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

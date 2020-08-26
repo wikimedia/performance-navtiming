@@ -32,7 +32,7 @@ class TestNavTiming(unittest.TestCase):
             else:
                 yield value
 
-    def test_parse_ua(self):
+    def test_allowlist_ua(self):
         data_path = os.path.join(os.path.dirname(__file__), 'navtiming_ua_data.yaml')
         with open(data_path) as data_file:
             data = yaml.safe_load(data_file)
@@ -41,7 +41,7 @@ class TestNavTiming(unittest.TestCase):
                 uas = data.get(case)
                 for ua in uas:
                     self.assertEqual(
-                        self.navtiming.parse_ua(ua),
+                        self.navtiming.allowlist_ua(ua),
                         expect
                     )
 
@@ -112,6 +112,57 @@ class TestNavTiming(unittest.TestCase):
         event['navigationStart'] = 7
 
         self.assertFalse(self.navtiming.is_compliant(event, None))
+
+    def test_ua_parse_ios(self):
+        ios_ua = 'WikipediaApp/5.3.3.1038 (iOS 10.2; Phone)'
+        parsed = {
+            'os_family': 'iOS',
+            'browser_major': None,
+            'browser_family': 'Other'
+        }
+        self.assertEqual(parsed,
+                         self.navtiming.parse_ua(ios_ua))
+
+    def test_ua_parse_android(self):
+        android_ua = 'WikipediaApp/2.4.160-r-2016-10-14 (Android 4.4.2; Phone)'
+        parsed = {
+            'os_family': 'Android',
+            'browser_family': 'Android',
+            'browser_major': '4'
+        }
+        self.assertEqual(parsed,
+                         self.navtiming.parse_ua(android_ua))
+
+    def test_ua_parse_empty(self):
+        ua = ""
+        parsed = {
+            'os_family': 'Other',
+            'browser_major': None,
+            'browser_family': 'Other'
+        }
+        self.assertEqual(parsed,
+                         self.navtiming.parse_ua(ua))
+
+    def test_ua_parse_max_length(self):
+        long_ua = ("Mozilla/5.0 (X11; Linux x86_64_128) looooonguaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        with self.assertRaises(RuntimeError):
+            self.navtiming.parse_ua(long_ua)
 
 
 if __name__ == '__main__':

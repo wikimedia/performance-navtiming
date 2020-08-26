@@ -12,6 +12,7 @@ import socket
 import time
 
 from prometheus_client import start_http_server, Counter, Gauge, Histogram
+from ua_parser import user_agent_parser
 
 namespace = 'webperf'
 COUNTERS = {}
@@ -241,11 +242,43 @@ class NavTiming(object):
             self.log.warning('etcd key {} not found'.format(self.etcd_path))
         return self.master
 
-    # Only return the small subset of browsers we whitelisted, this to avoid arbitrary growth
+    def parse_ua(self, user_agent, max_length=800):
+        """
+        Returns a dict containing the parsed User Agent data
+        from a request's UA string. Uses the following format:
+        {
+            "device_family": "Other",
+            "browser_family": "IE",
+            "browser_major": "11",
+            "browser_major": "0",
+            "os_family": "Windows Vista",
+            "os_major": null,
+            "os_minor": null,
+            "wmf_app_version": "-"
+        }
+        App version in user agents is parsed as follows:
+        WikipediaApp/5.3.1.1011 (iOS 10.0.2; Phone)
+        "wmf_app_version":"5.3.1.1011"
+        WikipediaApp/2.4.160-r-2016-10-14 (Android 4.4.2; Phone) Google Play
+        "wmf_app_version":"2.4.160-r-2016-10-14"
+        """
+        if len(user_agent) > max_length:
+            raise RuntimeError("User Agent string length ({}) longer "
+                               "than the allowed {} chars"
+                               .format(len(user_agent), max_length))
+        formatted_ua = {}
+        parsed_ua = user_agent_parser.Parse(user_agent)
+        formatted_ua['browser_family'] = parsed_ua['user_agent']['family']
+        formatted_ua['browser_major'] = parsed_ua['user_agent']['major']
+        formatted_ua['os_family'] = parsed_ua['os']['family']
+
+        return formatted_ua
+
+    # Only return a small subset of browsers, this to avoid arbitrary growth
     # in Graphite with low-sampled properties that are not useful
     # (which has lots of other negative side effects too).
-    # Anything not in the whitelist should go into "Other" instead.
-    def parse_ua(self, ua):
+    # Anything not in the allowlist should go into "Other" instead.
+    def allowlist_ua(self, ua):
         """Return a tuple of browser_family and browser_major, or None.
 
         Can parse a raw user agent or a json object alredy digested by ua-parser
@@ -260,12 +293,12 @@ class NavTiming(object):
         """
         # If already a dict, then this is a digested user agent.
         if isinstance(ua, dict):
-            return self.parse_ua_obj(ua)
+            return self.allowlist_ua_obj(ua)
 
         # Else it's a json-string of the digested user agent.
-        return self.parse_ua_obj(json.loads(ua))
+        return self.allowlist_ua_obj(json.loads(ua))
 
-    def parse_ua_obj(self, ua_obj):
+    def allowlist_ua_obj(self, ua_obj):
         """
         Parses user agent digested by ua-parser
         Note that only browser major is reported
@@ -579,7 +612,19 @@ class NavTiming(object):
             # Not an oversample
             is_oversample = False
 
-        ua = self.parse_ua(meta['userAgent']) or ('Other', '_')
+        # Legacy EventLogging, UA parsing is done for us
+        if 'userAgent' in meta:
+            ua = self.allowlist_ua(meta['userAgent'])
+        # EventGate, we have to parse the UA string ourselves
+        elif 'http' in meta:
+            try:
+                ua = self.allowlist_ua(self.parse_ua(meta['http']['request_headers']['user-agent']))
+            except RuntimeError:
+                self.log.error('Could not parse UA string: too long. Defaulting to "Other".')
+                ua = ('Other', '_')
+
+        if not ua:
+            ua = ('Other', '_')
 
         return site, auth, ua, continent, country_name, is_oversample
 
