@@ -54,7 +54,7 @@ COUNTERS['firstinputdelay_seconds'] = \
 COUNTERS['navtiming_responsestart_by_host_seconds'] = \
     Histogram('navtiming_responsestart_by_host_seconds',
               'Response Start data from NavigationTiming schema by dc and host',
-              ['dc', 'host', 'cache_response_type'],
+              ['dc', 'host', 'cache_response_type', 'transfer_size'],
               namespace=namespace)
 
 
@@ -685,12 +685,25 @@ class NavTiming(object):
                         host, dc, _ = meta['recvFrom'].split('.')
 
                         cache_response_type = 'unknown'
+                        transfer_size = 'unknown'
 
                         if 'cacheResponseType' in event and len(event['cacheResponseType']):
                             cache_response_type = event['cacheResponseType']
 
+                        if 'transferSize' in event and event['transferSize'] > 0:
+                            if event['transferSize'] <= 10000:
+                                transfer_size = '0 - 10kB'
+                            elif event['transferSize'] <= 20000:
+                                transfer_size = '10kB - 20kB'
+                            elif event['transferSize'] <= 30000:
+                                transfer_size = '20kB - 30kB'
+                            elif event['transferSize'] <= 60000:
+                                transfer_size = '30kB - 60kB'
+                            elif event['transferSize'] > 60000:
+                                transfer_size = '60kB - inf'
+
                         COUNTERS['navtiming_responsestart_by_host_seconds'].labels(
-                            dc, host, cache_response_type
+                            dc, host, cache_response_type, transfer_size
                         ).observe(value / 1000.0)
                     except (KeyError, ValueError):
                         pass
