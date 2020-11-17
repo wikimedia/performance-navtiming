@@ -777,7 +777,7 @@ class NavTiming(object):
                             consumer.close()
                         break
                     COUNTERS['consumed_messages'].inc()
-                    meta = json.loads(message.value)
+                    meta = json.loads(message.value.decode('utf-8'))
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
                         if f is not None:
