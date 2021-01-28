@@ -647,14 +647,14 @@ class NavTiming(object):
         wiki = meta['wiki']
         group = self.wiki_to_group(wiki)
 
-        if not self.is_compliant(event, meta['userAgent']):
-            COUNTERS['navtiming_invalid_events'].labels(group).inc()
-            yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
-            return
-
         try:
             site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
         except Exception:
+            return
+
+        if not self.is_compliant(event, ua):
+            COUNTERS['navtiming_invalid_events'].labels(group).inc()
+            yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
         metrics_nav2 = {}
