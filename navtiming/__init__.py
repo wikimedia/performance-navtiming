@@ -486,6 +486,12 @@ class NavTiming(object):
 
     def handle_quick_survey_initiation(self, meta):
         event = meta['event']
+
+        # Debugging missing wiki field error from T271208
+        if 'wiki' not in meta:
+            self.log.error('Invalid QuickSurveyInitiation event, missing wiki field: {}'.format(meta))
+            return
+
         wiki = meta['wiki']
         surveyCodeName = event.get('surveyCodeName')
         eventName = event.get('eventName')
