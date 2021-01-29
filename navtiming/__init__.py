@@ -486,12 +486,6 @@ class NavTiming(object):
 
     def handle_quick_survey_initiation(self, meta):
         event = meta['event']
-
-        # Debugging missing wiki field error from T271208
-        if 'wiki' not in meta:
-            self.log.error('Invalid QuickSurveyInitiation event, missing wiki field: {}'.format(meta))
-            return
-
         wiki = meta['wiki']
         surveyCodeName = event.get('surveyCodeName')
         eventName = event.get('eventName')
@@ -831,9 +825,8 @@ class NavTiming(object):
                     meta = json.loads(message.value.decode('utf-8'))
 
                     # Canary events are fake events used to monitor the event pipeline
-                    if 'domain' in meta:
-                        if meta['domain'] == 'canary':
-                            continue
+                    if 'meta' in meta and 'domain' in meta['meta'] and meta['meta']['domain'] == 'canary':
+                        continue
 
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
