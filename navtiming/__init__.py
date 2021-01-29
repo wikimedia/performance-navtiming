@@ -823,6 +823,12 @@ class NavTiming(object):
                         break
                     COUNTERS['consumed_messages'].inc()
                     meta = json.loads(message.value.decode('utf-8'))
+
+                    # Canary events are fake events used to monitor the event pipeline
+                    if 'domain' in meta:
+                        if meta['domain'] == 'canary':
+                            continue
+
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
                         if f is not None:
