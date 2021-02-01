@@ -650,6 +650,7 @@ class NavTiming(object):
         try:
             site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
         except Exception:
+            self.log.exception('Exception occured in get_navigation_timing_context')
             return
 
         if not self.is_compliant(event, ua):
@@ -826,6 +827,7 @@ class NavTiming(object):
 
                     # Canary events are fake events used to monitor the event pipeline
                     if 'meta' in meta and 'domain' in meta['meta'] and meta['meta']['domain'] == 'canary':
+                        self.log.info('Canary event')
                         continue
 
                     if 'schema' in meta:
