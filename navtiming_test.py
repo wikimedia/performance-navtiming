@@ -118,6 +118,7 @@ class TestNavTiming(unittest.TestCase):
         parsed = {
             'os_family': 'iOS',
             'browser_major': None,
+            'browser_minor': None,
             'browser_family': 'Other'
         }
         self.assertEqual(parsed,
@@ -128,7 +129,8 @@ class TestNavTiming(unittest.TestCase):
         parsed = {
             'os_family': 'Android',
             'browser_family': 'Android',
-            'browser_major': '4'
+            'browser_major': '4',
+            'browser_minor': '4'
         }
         self.assertEqual(parsed,
                          self.navtiming.parse_ua(android_ua))
@@ -138,6 +140,7 @@ class TestNavTiming(unittest.TestCase):
         parsed = {
             'os_family': 'Other',
             'browser_major': None,
+            'browser_minor': None,
             'browser_family': 'Other'
         }
         self.assertEqual(parsed,

@@ -270,6 +270,7 @@ class NavTiming(object):
         parsed_ua = user_agent_parser.Parse(user_agent)
         formatted_ua['browser_family'] = parsed_ua['user_agent']['family']
         formatted_ua['browser_major'] = parsed_ua['user_agent']['major']
+        formatted_ua['browser_minor'] = parsed_ua['user_agent']['minor']
         formatted_ua['os_family'] = parsed_ua['os']['family']
 
         return formatted_ua
