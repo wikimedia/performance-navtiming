@@ -14,56 +14,12 @@ import time
 from prometheus_client import start_http_server, Counter, Gauge, Histogram
 from ua_parser import user_agent_parser
 
-namespace = 'webperf'
-COUNTERS = {}
-
-# Generic
-COUNTERS['consumed_messages'] = \
-    Counter('consumed_messages', 'Messages consumed from Kafka', namespace=namespace)
-COUNTERS['handled_messages'] = \
-    Counter('handled_messages', 'Messages handled', ['schema'], namespace=namespace)
-COUNTERS['latest_handled_time_seconds'] = \
-    Gauge('latest_handled_time_seconds', 'UNIX timestamp of most recent message', ['schema'], namespace=namespace)
-COUNTERS['errors'] = \
-    Counter('errors', 'Unhandled exceptions while processing', namespace=namespace)
-
-# Handlers
-COUNTERS['performance_survey_responses'] = \
-    Counter('performance_survey_responses', 'Performance survey responses',
-            ['wiki', 'response'], namespace=namespace)
-COUNTERS['performance_survey_initiations'] = \
-    Counter('performance_survey_initiations', 'Performance survey initiations',
-            ['wiki', 'event'], namespace=namespace)
-COUNTERS['painttiming_invalid_events'] = \
-    Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
-            ['group'], namespace=namespace)
-COUNTERS['firstinputtiming_invalid_events'] = \
-    Counter('firstinputtiming_invalid_events', 'Invalid data found when processing FirstInputTiming',
-            ['group'], namespace=namespace)
-COUNTERS['navtiming_invalid_events'] = \
-    Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
-            ['group'], namespace=namespace)
-COUNTERS['savetiming_invalid_events'] = \
-    Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
-            ['group'], namespace=namespace)
-COUNTERS['firstinputdelay_seconds'] = \
-    Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
-              ['group', 'ua_family', 'ua_version'],
-              # Most observed FID values are between 1 and 100ms
-              buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
-              namespace=namespace)
-COUNTERS['navtiming_responsestart_by_host_seconds'] = \
-    Histogram('navtiming_responsestart_by_host_seconds',
-              'Response Start data from NavigationTiming schema by dc and host',
-              ['dc', 'host', 'cache_response_type', 'transfer_size'],
-              namespace=namespace)
-
 
 class NavTiming(object):
     def __init__(self, brokers=['127.0.0.1:9092'], consumer_group='navtiming',
                  statsd_host='localhost', statsd_port=8125, datacenter=None,
                  etcd_domain=None, etcd_path=None, etcd_refresh=10, verbose=False,
-                 dry_run=False):
+                 dry_run=False, prometheus_namespace='webperf'):
         self.brokers = brokers
         self.consumer_group = consumer_group
         self.statsd_host = statsd_host
@@ -203,6 +159,53 @@ class NavTiming(object):
             'frwiki': 'group2',        # fr.wikipedia.org
             'ruwiki': 'group2',        # ru.wikipedia.org
         }
+
+        self.initialize_prometheus_counters(prometheus_namespace)
+
+    def initialize_prometheus_counters(self, namespace):
+        self.prometheus_counters = {}
+
+        # Generic
+        self.prometheus_counters['consumed_messages'] = \
+            Counter('consumed_messages', 'Messages consumed from Kafka', namespace=namespace)
+        self.prometheus_counters['handled_messages'] = \
+            Counter('handled_messages', 'Messages handled', ['schema'], namespace=namespace)
+        self.prometheus_counters['latest_handled_time_seconds'] = \
+            Gauge('latest_handled_time_seconds', 'UNIX timestamp of most recent message',
+                  ['schema'], namespace=namespace)
+        self.prometheus_counters['errors'] = \
+            Counter('errors', 'Unhandled exceptions while processing', namespace=namespace)
+
+        # Handlers
+        self.prometheus_counters['performance_survey_responses'] = \
+            Counter('performance_survey_responses', 'Performance survey responses',
+                    ['wiki', 'response'], namespace=namespace)
+        self.prometheus_counters['performance_survey_initiations'] = \
+            Counter('performance_survey_initiations', 'Performance survey initiations',
+                    ['wiki', 'event'], namespace=namespace)
+        self.prometheus_counters['painttiming_invalid_events'] = \
+            Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
+                    ['group'], namespace=namespace)
+        self.prometheus_counters['firstinputtiming_invalid_events'] = \
+            Counter('firstinputtiming_invalid_events', 'Invalid data found when processing FirstInputTiming',
+                    ['group'], namespace=namespace)
+        self.prometheus_counters['navtiming_invalid_events'] = \
+            Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
+                    ['group'], namespace=namespace)
+        self.prometheus_counters['savetiming_invalid_events'] = \
+            Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
+                    ['group'], namespace=namespace)
+        self.prometheus_counters['firstinputdelay_seconds'] = \
+            Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
+                      ['group', 'ua_family', 'ua_version'],
+                      # Most observed FID values are between 1 and 100ms
+                      buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
+                      namespace=namespace)
+        self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
+            Histogram('navtiming_responsestart_by_cache_host_seconds',
+                      'Response Start data from NavigationTiming schema by cache host',
+                      ['cache_host', 'cache_response_type', 'transfer_size'],
+                      namespace=namespace)
 
     def wiki_to_group(self, wiki):
         return self.group_mapping.get(wiki, 'other')
@@ -467,7 +470,7 @@ class NavTiming(object):
             yield self.make_stat('mw.performance.save', duration)
             yield self.make_stat('mw.performance.save_by_group', group, duration)
         else:
-            COUNTERS['savetiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['savetiming_invalid_events'].labels(group).inc()
 
     def handle_quick_surveys_responses(self, meta):
         event = meta['event']
@@ -481,7 +484,7 @@ class NavTiming(object):
         # Example: ext-quicksurveys-example-internal-survey-answer-neutral
         response = surveyResponseValue[48:]
 
-        COUNTERS['performance_survey_responses'].labels(wiki, response).inc()
+        self.prometheus_counters['performance_survey_responses'].labels(wiki, response).inc()
 
         yield self.make_count('performance.survey', wiki, response)
 
@@ -494,7 +497,7 @@ class NavTiming(object):
         if surveyCodeName != 'perceived-performance-survey' or not wiki or not eventName:
             return
 
-        COUNTERS['performance_survey_initiations'].labels(wiki, eventName).inc()
+        self.prometheus_counters['performance_survey_initiations'].labels(wiki, eventName).inc()
 
         yield self.make_count('performance.survey_initiation', wiki, eventName)
 
@@ -513,14 +516,14 @@ class NavTiming(object):
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
         else:
-            COUNTERS['painttiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
             yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
             return
 
         value = event['startTime']
 
         if not self.is_sane_navtiming2(value):
-            COUNTERS['painttiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.painttiming_discard', 'isSane')
             return
 
@@ -554,11 +557,11 @@ class NavTiming(object):
         fid = event['FID']
 
         if not self.is_sane_navtiming2(fid):
-            COUNTERS['firstinputtiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['firstinputtiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.firstinputtiming_discard', 'isSane')
             return
 
-        COUNTERS['firstinputdelay_seconds'].labels(
+        self.prometheus_counters['firstinputdelay_seconds'].labels(
             group, ua_family, ua_version
         ).observe(fid / 1000.0)
 
@@ -655,7 +658,7 @@ class NavTiming(object):
             return
 
         if not self.is_compliant(event, ua):
-            COUNTERS['navtiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['navtiming_invalid_events'].labels(group).inc()
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
@@ -711,7 +714,7 @@ class NavTiming(object):
 
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
-            COUNTERS['navtiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['navtiming_invalid_events'].labels(group).inc()
             yield self.make_count('frontend.navtiming_discard', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
@@ -729,13 +732,15 @@ class NavTiming(object):
 
                 if metric == 'responseStart' and not is_oversample:
                     try:
-                        host, dc, _ = meta['recvFrom'].split('.')
-
                         cache_response_type = 'unknown'
+                        cache_host = 'unknown'
                         transfer_size = 'unknown'
 
                         if 'cacheResponseType' in event and len(event['cacheResponseType']):
                             cache_response_type = event['cacheResponseType']
+
+                        if 'cacheHost' in event and len(event['cacheHost']):
+                            cache_host = event['cacheHost']
 
                         if 'transferSize' in event and event['transferSize'] > 0:
                             if event['transferSize'] <= 10000:
@@ -749,8 +754,8 @@ class NavTiming(object):
                             elif event['transferSize'] > 60000:
                                 transfer_size = '60kB - inf'
 
-                        COUNTERS['navtiming_responsestart_by_host_seconds'].labels(
-                            dc, host, cache_response_type, transfer_size
+                        self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'].labels(
+                            cache_host, cache_response_type, transfer_size
                         ).observe(value / 1000.0)
                     except (KeyError, ValueError):
                         pass
@@ -823,7 +828,7 @@ class NavTiming(object):
                         if consumer is not None:
                             consumer.close()
                         break
-                    COUNTERS['consumed_messages'].inc()
+                    self.prometheus_counters['consumed_messages'].inc()
                     meta = json.loads(message.value.decode('utf-8'))
 
                     # Canary events are fake events used to monitor the event pipeline
@@ -834,8 +839,10 @@ class NavTiming(object):
                     if 'schema' in meta:
                         f = self.handlers.get(meta['schema'])
                         if f is not None:
-                            COUNTERS['handled_messages'].labels(meta['schema']).inc()
-                            COUNTERS['latest_handled_time_seconds'].labels(meta['schema']).set_to_current_time()
+                            self.prometheus_counters['handled_messages'].labels(meta['schema']).inc()
+                            self.prometheus_counters['latest_handled_time_seconds'].labels(
+                                meta['schema']
+                            ).set_to_current_time()
                             for stat in f(meta):
                                 self.dispatch_stat(stat)
             except KeyboardInterrupt:
@@ -843,7 +850,7 @@ class NavTiming(object):
                 consumer.close()
                 break
             except Exception:
-                COUNTERS['errors'].inc()
+                self.prometheus_counters['errors'].inc()
                 self.log.exception('Unhandled exception in main loop, restarting consumer')
 
 

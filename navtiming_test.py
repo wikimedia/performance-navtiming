@@ -20,9 +20,13 @@ class TestNavTiming(unittest.TestCase):
     # addition to the value diff, not instead of the diff.
     longMessage = True
     maxDiff = None
+    prometheus_namespace_counter = 0
 
     def setUp(self):
-        self.navtiming = navtiming.NavTiming()
+        # Use a fresh Prometheus namespace for each test
+        TestNavTiming.prometheus_namespace_counter += 1
+        prometheus_namespace = 'webperf' + str(TestNavTiming.prometheus_namespace_counter) + '_'
+        self.navtiming = navtiming.NavTiming(prometheus_namespace=prometheus_namespace)
 
     def flatten(self, values):
         for value in values:
@@ -52,6 +56,12 @@ class TestNavTiming(unittest.TestCase):
             for key, case in cases.items():
                 if key == 'templates':
                     continue
+
+                # Use a fresh Prometheus namespace for each test case
+                TestNavTiming.prometheus_namespace_counter += 1
+                prometheus_namespace = 'webperf' + str(TestNavTiming.prometheus_namespace_counter)
+                self.navtiming.initialize_prometheus_counters(prometheus_namespace)
+
                 if isinstance(case['input'], list):
                     messages = case['input']
                 else:
@@ -80,9 +90,10 @@ class TestNavTiming(unittest.TestCase):
 
                 for metric in case.get('metrics', []):
                     name, labels, value = metric
+                    expected_name = prometheus_namespace + '_' + name
                     self.assertEqual(
-                        REGISTRY.get_sample_value(name, labels),
-                        value)
+                        REGISTRY.get_sample_value(expected_name, labels),
+                        value, 'Expected value mismatch for %r %r' % (expected_name, labels))
 
     def test_is_compliant(self):
         event = {
