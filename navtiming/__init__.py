@@ -197,7 +197,7 @@ class NavTiming(object):
                     ['group'], namespace=namespace)
         self.prometheus_counters['firstinputdelay_seconds'] = \
             Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
-                      ['group', 'ua_family', 'ua_version'],
+                      ['site', 'group', 'ua_family', 'ua_version'],
                       # Most observed FID values are between 1 and 100ms
                       buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
                       namespace=namespace)
@@ -205,6 +205,12 @@ class NavTiming(object):
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'Response Start data from NavigationTiming schema by cache host',
                       ['cache_host', 'cache_response_type', 'transfer_size'],
+                      namespace=namespace)
+        self.prometheus_counters['painttiming_seconds'] = \
+            Histogram('painttiming_seconds', 'Paint Timing data from PaintTiming schema',
+                      ['metric', 'site', 'group', 'ua_family', 'ua_version'],
+                      # Most observed Paint Timing values are between 500ms and 5s
+                      buckets=[0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0],
                       namespace=namespace)
 
     def wiki_to_group(self, wiki):
@@ -511,6 +517,13 @@ class NavTiming(object):
         except Exception:
             return
 
+        ua_family, ua_version = ua
+        value = event['startTime']
+
+        self.prometheus_counters['painttiming_seconds'].labels(
+            event['name'], site, group, ua_family, ua_version
+        ).observe(value / 1000.0)
+
         if event['name'] == 'first-paint':
             metric = 'firstPaint'
         elif event['name'] == 'first-contentful-paint':
@@ -519,8 +532,6 @@ class NavTiming(object):
             self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
             yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
             return
-
-        value = event['startTime']
 
         if not self.is_sane_navtiming2(value):
             self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
@@ -562,7 +573,7 @@ class NavTiming(object):
             return
 
         self.prometheus_counters['firstinputdelay_seconds'].labels(
-            group, ua_family, ua_version
+            site, group, ua_family, ua_version
         ).observe(fid / 1000.0)
 
         yield self.make_stat('frontend.firstinputtiming.fid', fid)
