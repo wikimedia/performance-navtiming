@@ -612,12 +612,12 @@ PaintTiming:
   - frontend.navtiming2_oversample.firstPaint.by_country.France:805|ms
   - frontend.painttiming_group.group1:1|c
  metrics:
-  - ['painttiming_seconds_count', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
-  - ['painttiming_seconds_sum', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.805]
-  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.1'}, 0]
-  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.5'}, 0]
-  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.75'}, 0]
-  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'site': 'desktop', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '1.0'}, 1]
+  - ['painttiming_seconds_count', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
+  - ['painttiming_seconds_sum', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.805]
+  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.1'}, 0]
+  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.5'}, 0]
+  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.75'}, 0]
+  - ['painttiming_seconds_bucket', {'metric': 'first-paint', 'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '1.0'}, 1]
 
 QuickSurveyInitiation:
  input:
@@ -639,11 +639,11 @@ FirstInputTiming:
   - frontend.firstinputtiming.fid:20|ms
   - frontend.firstinputtiming.fid_by_group.group1:20|ms
  metrics:
-   - ['firstinputdelay_seconds_count', {'group': 'group1', 'site': 'desktop', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
-   - ['firstinputdelay_seconds_sum', {'group': 'group1', 'site': 'desktop', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.02]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'site': 'desktop', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.005'}, 0]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'site': 'desktop', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.01'}, 0]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'site': 'desktop', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.025'}, 1]
+   - ['firstinputdelay_seconds_count', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
+   - ['firstinputdelay_seconds_sum', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.02]
+   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.005'}, 0]
+   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.01'}, 0]
+   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.025'}, 1]
 
 EventGate:
  input:
