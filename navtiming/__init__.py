@@ -59,7 +59,8 @@ class NavTiming(object):
             'QuickSurveysResponses': self.handle_quick_surveys_responses,
             'QuickSurveyInitiation': self.handle_quick_survey_initiation,
             'PaintTiming': self.handle_paint_timing,
-            'FirstInputTiming': self.handle_first_input_timing
+            'FirstInputTiming': self.handle_first_input_timing,
+            'CpuBenchmark': self.handle_cpu_benchmark
         }
 
         # Mapping of continent names to ISO 3166 country codes.
@@ -211,6 +212,12 @@ class NavTiming(object):
                       ['metric', 'group', 'ua_family', 'ua_version'],
                       # Most observed Paint Timing values are between 500ms and 5s
                       buckets=[0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0],
+                      namespace=namespace)
+        self.prometheus_counters['cpubenchmark_seconds'] = \
+            Histogram('cpubenchmark_seconds', 'CPU benchmarking data from CpuBenchmark schema',
+                      ['battery_level', 'ua_family', 'ua_version', 'origin_country', 'is_oversample', 'is_anon'],
+                      # Most observed CPU benchmark times are between 50ms and 500ms
+                      buckets=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0],
                       namespace=namespace)
 
     def wiki_to_group(self, wiki):
@@ -578,6 +585,27 @@ class NavTiming(object):
 
         yield self.make_stat('frontend.firstinputtiming.fid', fid)
         yield self.make_stat('frontend.firstinputtiming.fid_by_group', group, fid)
+
+    def handle_cpu_benchmark(self, meta):
+        event = meta['event']
+
+        try:
+            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+        except Exception:
+            return
+
+        ua_family, ua_version = ua
+        value = event['score']
+        bucketed_battery_level = str(int(round(event['batteryLevel'] * 10) * 10))
+
+        self.prometheus_counters['cpubenchmark_seconds'].labels(
+            bucketed_battery_level,
+            ua_family,
+            ua_version,
+            country_name,
+            str(is_oversample),
+            str(auth != 'authenticated')
+        ).observe(value / 1000.0)
 
     def get_navigation_timing_context(self, meta):
         event = meta['event']

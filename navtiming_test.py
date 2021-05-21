@@ -72,16 +72,20 @@ class TestNavTiming(unittest.TestCase):
                 for meta in messages:
                     f = self.navtiming.handlers.get(meta['schema'])
                     assert f is not None
-                    for stat in f(meta):
-                        # print stat # debug
-                        actual.append(stat)
+                    result = f(meta)
+                    # A handler may only emit Prometheus metrics, in which case it doesn't return anything
+                    if result is not None:
+                        for stat in result:
+                            # print stat # debug
+                            actual.append(stat)
                 # print "" # debug
                 try:
-                    self.assertItemsEqual(
-                        actual,
-                        self.flatten(case['expect']),
-                        key
-                    )
+                    if len(actual):
+                        self.assertItemsEqual(
+                            actual,
+                            self.flatten(case['expect']),
+                            key
+                        )
                 except AttributeError:
                     """
                     Test fails under Python3
