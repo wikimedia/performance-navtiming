@@ -607,6 +607,12 @@ class NavTiming(object):
             str(auth != 'authenticated')
         ).observe(value / 1000.0)
 
+        # We need at least one yield statement, so that Python will treat this
+        # as a generator function.  We don't actually yield any Graphite
+        # metrics for this schema, so the yield is unreachable.
+        return
+        yield
+
     def get_navigation_timing_context(self, meta):
         event = meta['event']
 
