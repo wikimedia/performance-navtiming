@@ -661,9 +661,15 @@ EventGate:
 CpuBenchmark:
  input:
   - {"event": {"pageviewToken":"example", "score":126, "batteryLevel":0.81, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+  - {"event": {"pageviewToken":"example", "score":126, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  metrics:
   - ['cpubenchmark_seconds_count', {'battery_level': '80', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False'}, 1]
   - ['cpubenchmark_seconds_sum', {'battery_level': '80', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False'}, 0.126]
   - ['cpubenchmark_seconds_bucket', {'battery_level': '80', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.05'}, 0]
   - ['cpubenchmark_seconds_bucket', {'battery_level': '80', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.1'}, 0]
   - ['cpubenchmark_seconds_bucket', {'battery_level': '80', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.2'}, 1]
+  - ['cpubenchmark_seconds_count', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False'}, 1]
+  - ['cpubenchmark_seconds_sum', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False'}, 0.126]
+  - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.05'}, 0]
+  - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.1'}, 0]
+  - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'ua_version': '55', 'origin_country': 'France', 'is_oversample': 'True', 'is_anon': 'False', 'le': '0.2'}, 1]

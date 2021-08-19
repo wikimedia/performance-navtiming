@@ -596,7 +596,10 @@ class NavTiming(object):
 
         ua_family, ua_version = ua
         value = event['score']
-        bucketed_battery_level = str(int(round(event['batteryLevel'] * 10) * 10))
+        if 'batteryLevel' in event:
+            bucketed_battery_level = str(int(round(event['batteryLevel'] * 10) * 10))
+        else:
+            bucketed_battery_level = "unknown"
 
         self.prometheus_counters['cpubenchmark_seconds'].labels(
             bucketed_battery_level,
