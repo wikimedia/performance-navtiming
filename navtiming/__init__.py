@@ -215,7 +215,7 @@ class NavTiming(object):
                       namespace=namespace)
         self.prometheus_counters['cpubenchmark_seconds'] = \
             Histogram('cpubenchmark_seconds', 'CPU benchmarking data from CpuBenchmark schema',
-                      ['battery_level', 'ua_family', 'ua_version', 'origin_country', 'is_oversample', 'is_anon'],
+                      ['battery_level', 'ua_family', 'origin_country', 'is_oversample'],
                       # Most observed CPU benchmark times are between 50ms and 500ms
                       buckets=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0],
                       namespace=namespace)
@@ -594,20 +594,23 @@ class NavTiming(object):
         except Exception:
             return
 
-        ua_family, ua_version = ua
+        ua_family, _ = ua
         value = event['score']
         if 'batteryLevel' in event:
-            bucketed_battery_level = str(int(round(event['batteryLevel'] * 10) * 10))
+            if event['batteryLevel'] < 0.33:
+                bucketed_battery_level = "low"
+            elif event['batteryLevel'] <= 0.67:
+                bucketed_battery_level = "medium"
+            else:
+                bucketed_battery_level = "high"
         else:
             bucketed_battery_level = "unknown"
 
         self.prometheus_counters['cpubenchmark_seconds'].labels(
             bucketed_battery_level,
             ua_family,
-            ua_version,
             country_name,
             str(is_oversample),
-            str(auth != 'authenticated')
         ).observe(value / 1000.0)
 
         # We need at least one yield statement, so that Python will treat this
