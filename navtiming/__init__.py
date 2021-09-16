@@ -16,12 +16,21 @@ from ua_parser import user_agent_parser
 
 
 class NavTiming(object):
-    def __init__(self, brokers=['127.0.0.1:9092'], consumer_group='navtiming',
+    def __init__(self, brokers=None, consumer_group='navtiming',
                  statsd_host='localhost', statsd_port=8125, datacenter=None,
                  etcd_domain=None, etcd_path=None, etcd_refresh=10, verbose=False,
-                 dry_run=False, prometheus_namespace='webperf'):
-        self.brokers = brokers
+                 dry_run=False, prometheus_namespace='webperf',
+                 security_protocol='PLAINTEXT', ssl_cafile=None):
+        if brokers is None:
+            if security_protocol in ('SSL', 'SASL_SSL'):
+                self.brokers = ('localhost:9093',)
+            else:
+                self.brokers = ('localhost:9092',)
+        else:
+            self.brokers = brokers
         self.consumer_group = consumer_group
+        self.security_protocol = security_protocol
+        self.ssl_cafile = ssl_cafile
         self.statsd_host = statsd_host
         self.statsd_port = statsd_port
         self.verbose = verbose
@@ -839,6 +848,10 @@ class NavTiming(object):
                                              kafka_bootstrap_servers))
                 consumer = KafkaConsumer(
                     bootstrap_servers=kafka_bootstrap_servers,
+                    security_protocol=self.security_protocol,
+                    ssl_cafile=self.ssl_cafile,
+                    # We use the cluster name instead of the hostname as CN.
+                    ssl_check_hostname=False,
                     group_id=self.consumer_group,
                     auto_offset_reset='latest',
                     enable_auto_commit=True,
@@ -915,6 +928,13 @@ def main(cluster=None, config=None):
                     required=False if parsed_configs.get('brokers') else True,
                     default=parsed_configs.get('brokers'),
                     help='Comma-separated list of kafka brokers')
+    ap.add_argument('--security-protocol',
+                    default=parsed_configs.get('security_protocol', 'PLAINTEXT'),
+                    help='Protocol used to communicate with Kafka brokers. '
+                         'Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL. Default: PLAINTEXT')
+    ap.add_argument('--ssl-cafile',
+                    default=parsed_configs.get('ssl_cafile'),
+                    help='Optional filename of certificate authority file to use in certificate verification')
     ap.add_argument('--consumer-group',
                     required=False if parsed_configs.get('consumer_group') else True,
                     default=parsed_configs.get('consumer_group'),
@@ -965,6 +985,8 @@ def main(cluster=None, config=None):
     args = ap.parse_args()
 
     nt = NavTiming(brokers=args.brokers.split(','),
+                   security_protocol=args.security_protocol,
+                   ssl_cafile=args.ssl_cafile,
                    consumer_group=args.consumer_group,
                    statsd_host=args.statsd_host,
                    statsd_port=args.statsd_port,
