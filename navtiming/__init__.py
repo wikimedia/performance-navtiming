@@ -205,16 +205,34 @@ class NavTiming(object):
                     namespace=namespace)
 
         # Navigation Timing and Paint Timing
+        #
+        # We use <=10 buckets per metric, and generally prefer to use the same buckets
+        # for metrics that happen close to each other in the page load cycle,
+        # to make visualisations and quantiles more consistently comparable
+        # and give them the same kind of accuracy and breakdown.
+        #
+        # Early stage:
+        # * responseStart     p50-p95 is 0.2s-1.3s with p99 at 5s (Nov 2022)
+        #
+        # Late stage:
+        # * domInteractive    p50-p95 is 0.4s-2.5s with p99 at 20s (Nov 2022)
+        # * loadEventEnd      p50-p95 is 0.7s-3.7s with p99 at 30s (Nov 2022)
+        # * firstContentPaint p50-p95 is 0.5s-3.0s with p99 at 50s (Nov 2022)
         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
             Histogram('navtiming_responsestart_by_cache_host_seconds',
-                      'Response Start data from NavigationTiming schema by cache host',
+                      'responseStart from the Navigation Timing API',
                       ['cache_host', 'cache_response_type'],
                       namespace=namespace)
         self.prometheus_counters['painttiming_seconds'] = \
-            Histogram('painttiming_seconds', 'Paint Timing data from PaintTiming schema',
+            Histogram('painttiming_seconds', 'Deprecated in favor of painttiming_firstcontentfulpaint_seconds',
                       ['metric', 'group', 'ua_family'],
-                      # Most observed Paint Timing values are between 500ms and 5s
                       buckets=[0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0],
+                      namespace=namespace)
+        self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
+            Histogram('painttiming_firstcontentfulpaint_seconds',
+                      'first-contentful-paint from the Paint Timing API',
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
         self.prometheus_counters['cpubenchmark_seconds'] = \
             Histogram('cpubenchmark_seconds', 'CPU benchmarking data from CpuBenchmark schema',
@@ -530,6 +548,8 @@ class NavTiming(object):
         ua_family, ua_version = ua
         value = event['startTime']
 
+        # TODO: Deprecated, remove soon (T323129)
+        # For old data continuity we have Graphite.
         self.prometheus_counters['painttiming_seconds'].labels(
             event['name'], group, ua_family
         ).observe(value / 1000.0)
@@ -538,6 +558,9 @@ class NavTiming(object):
             metric = 'firstPaint'
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
+            self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'].labels(
+                auth, country_name, continent, ua_family, is_oversample
+            ).observe(value / 1000.0)
         else:
             self.prometheus_counters['painttiming_invalid_events'].inc()
             yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')

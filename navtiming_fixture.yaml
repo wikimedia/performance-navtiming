@@ -667,3 +667,18 @@ CpuBenchmark:
   - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'origin_country': 'France', 'is_oversample': 'True', 'le': '0.05'}, 0]
   - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'origin_country': 'France', 'is_oversample': 'True', 'le': '0.1'}, 0]
   - ['cpubenchmark_seconds_bucket', {'battery_level': 'unknown', 'ua_family': 'Firefox', 'origin_country': 'France', 'is_oversample': 'True', 'le': '0.2'}, 1]
+
+First contentful paint:
+  input:
+    - {"event":{"pageviewToken":"-","isAnon":true,"isOversample":false,"originCountry":"XX","name":"first-contentful-paint","startTime":303},"schema":"PaintTiming","webHost":"example","wiki":"example","$schema":"/analytics/legacy/painttiming/1.0.0","client_dt":"2022-11-09T12:16:35.112Z","meta":{"stream":"eventlogging_PaintTiming","domain":"example","id":"-","dt":"2022-11-09T12:16:59.891Z","request_id":"-"},"dt":"2022-11-09T12:16:59.891Z","http":{"request_headers":{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"}}}
+  expect:
+    - 'frontend.navtiming2.firstContentfulPaint.desktop.anonymous:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.desktop.overall:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.overall:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.by_browser.Chrome.107:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.by_browser.Chrome.all:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.by_continent.other:303|ms'
+    - 'frontend.navtiming2.firstContentfulPaint.by_country.other:303|ms'
+    - 'frontend.painttiming_group.other:1|c'
+  metrics:
+    - ['painttiming_firstcontentfulpaint_seconds_count', {'mw_auth': 'anonymous', 'geo_country': other, 'geo_continent': 'other', 'ua_family': 'Chrome', 'is_oversample': 'False'}, 1]
