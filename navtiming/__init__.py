@@ -169,6 +169,16 @@ class NavTiming(object):
             'ruwiki': 'group2',        # ru.wikipedia.org
         }
 
+        self.namespace_mapping = {
+            -1: 'special',              # Special pages
+            0: 'main',                  # "Real" content articles.
+            2: 'user',                  # User pages
+            4: 'project',               # Information about the wiki
+            6: 'file',                  # Media description pages
+            12: 'help',                 # Help pages
+            14: 'category',             # Category description pages
+        }
+
         self.initialize_prometheus_counters(prometheus_namespace)
 
     def initialize_prometheus_counters(self, namespace):
@@ -231,19 +241,22 @@ class NavTiming(object):
         self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
             Histogram('painttiming_firstcontentfulpaint_seconds',
                       'first-contentful-paint from the Paint Timing API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
+                       'mw_namespace', 'mw_group', 'mw_skin'],
                       buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
         self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'] = \
             Histogram('painttiming_largestcontentfulpaint_seconds',
                       'Largest contentful paint from the largest contentful paint API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
+                       'mw_namespace', 'mw_group', 'mw_skin'],
                       buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
         self.prometheus_counters['cumulativelayoutshift_score'] = \
             Histogram('cumulativelayoutshift_score',
                       'Cumulative layout shift from the layout shift API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
+                       'mw_namespace', 'mw_group', 'mw_skin'],
                       buckets=[0.05, 0.1, 0.2, 0.25, 0.3, 0.5, 1.0],
                       namespace=namespace)
         self.prometheus_counters['cpubenchmark_seconds'] = \
@@ -556,7 +569,8 @@ class NavTiming(object):
         group = self.wiki_to_group(wiki)
 
         try:
-            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+                self.get_navigation_timing_context(meta)
         except Exception:
             return
 
@@ -574,7 +588,7 @@ class NavTiming(object):
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
             self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'].labels(
-                auth, country_name, continent, ua_family, is_oversample
+                auth, country_name, continent, ua_family, is_oversample, action, namespace, group, skin
             ).observe(value / 1000.0)
         else:
             self.prometheus_counters['painttiming_invalid_events'].inc()
@@ -604,7 +618,8 @@ class NavTiming(object):
         event = meta['event']
 
         try:
-            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+                self.get_navigation_timing_context(meta)
         except Exception:
             return
 
@@ -644,6 +659,11 @@ class NavTiming(object):
         else:
             site = 'desktop'
         auth = 'anonymous' if event.get('isAnon') else 'authenticated'
+
+        if 'skin' in event:
+            skin = event['skin']
+        else:
+            skin = 'unknown'
 
         country_code = event.get('originCountry')
         continent = self.iso_3166_to_continent.get(country_code, 'other')
@@ -695,7 +715,27 @@ class NavTiming(object):
         if not ua:
             ua = ('Other', '_')
 
-        return site, auth, ua, continent, country_name, is_oversample
+        # Handle action https://www.mediawiki.org/wiki/Manual:$wgActions
+        # Only collect views|other
+        if 'action' in event:
+            if event['action'] != 'view':
+                action = 'other'
+            else:
+                action = 'view'
+        else:
+            # Special pages do not have any actions but maybe we should call it something else?
+            action = 'other'
+
+        # Handle namespaces https://www.mediawiki.org/wiki/Manual:Namespace
+        if 'namespaceId' in event:
+            # All uneven namespaces over 0 is talk pages
+            if event['namespaceId'] % 2 > 0 and event['namespaceId'] > 0:
+                namespace = 'talk'
+            else:
+                namespace = self.namespace_mapping.get(event['namespaceId'], 'other')
+        else:
+            namespace = 'other'
+        return site, auth, ua, continent, country_name, is_oversample, action, namespace, skin
 
     def make_navigation_timing_stats(self, site, auth, ua, continent, country_name, is_oversample, metric, value):
         if is_oversample:
@@ -717,7 +757,8 @@ class NavTiming(object):
         group = self.wiki_to_group(wiki)
 
         try:
-            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
+            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+                self.get_navigation_timing_context(meta)
         except Exception:
             self.log.exception('Exception occured in get_navigation_timing_context')
             return
@@ -824,11 +865,11 @@ class NavTiming(object):
 
                 if metric == 'cumulativeLayoutShift':
                     self.prometheus_counters['cumulativelayoutshift_score'].labels(
-                        auth, country_name, continent, ua[0], is_oversample
+                        auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
                     ).observe(value)
                 if metric == 'largestContentfulPaint':
                     self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
-                        auth, country_name, continent, ua[0], is_oversample
+                        auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
                     ).observe(value / 1000.0)
 
             yield self.make_count('frontend.navtiming_group', group)
