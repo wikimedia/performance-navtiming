@@ -76,21 +76,16 @@ class TestNavTiming(unittest.TestCase):
                     # A handler may only emit Prometheus metrics, in which case it doesn't return anything
                     if result is not None:
                         for stat in result:
-                            # print stat # debug
-                            actual.append(stat)
+                            # print(stat) # debug
+                            actual.append(stat.decode('utf-8'))
                 # print "" # debug
-                try:
-                    if len(actual):
-                        self.assertItemsEqual(
-                            actual,
-                            self.flatten(case['expect']),
-                            key
-                        )
-                except AttributeError:
-                    """
-                    Test fails under Python3
-                    """
-                    pass
+
+                if len(actual):
+                    self.assertCountEqual(
+                        actual,
+                        self.flatten(case['expect']),
+                        str(key)
+                    )
 
                 for metric in case.get('metrics', []):
                     name, labels, value = metric
