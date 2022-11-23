@@ -208,7 +208,7 @@ class NavTiming(object):
                       namespace=namespace)
         self.prometheus_counters['painttiming_seconds'] = \
             Histogram('painttiming_seconds', 'Paint Timing data from PaintTiming schema',
-                      ['metric', 'group', 'ua_family', 'ua_version'],
+                      ['metric', 'group', 'ua_family'],
                       # Most observed Paint Timing values are between 500ms and 5s
                       buckets=[0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0],
                       namespace=namespace)
@@ -527,7 +527,7 @@ class NavTiming(object):
         value = event['startTime']
 
         self.prometheus_counters['painttiming_seconds'].labels(
-            event['name'], group, ua_family, ua_version
+            event['name'], group, ua_family
         ).observe(value / 1000.0)
 
         if event['name'] == 'first-paint':
