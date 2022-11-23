@@ -204,7 +204,7 @@ class NavTiming(object):
         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'Response Start data from NavigationTiming schema by cache host',
-                      ['cache_host', 'cache_response_type', 'transfer_size'],
+                      ['cache_host', 'cache_response_type'],
                       namespace=namespace)
         self.prometheus_counters['painttiming_seconds'] = \
             Histogram('painttiming_seconds', 'Paint Timing data from PaintTiming schema',
@@ -757,7 +757,6 @@ class NavTiming(object):
                     try:
                         cache_response_type = 'unknown'
                         cache_host = 'unknown'
-                        transfer_size = 'unknown'
 
                         if 'cacheResponseType' in event and len(event['cacheResponseType']):
                             cache_response_type = event['cacheResponseType']
@@ -765,20 +764,8 @@ class NavTiming(object):
                         if 'cacheHost' in event and len(event['cacheHost']):
                             cache_host = event['cacheHost']
 
-                        if 'transferSize' in event and event['transferSize'] > 0:
-                            if event['transferSize'] <= 10000:
-                                transfer_size = '0 - 10kB'
-                            elif event['transferSize'] <= 20000:
-                                transfer_size = '10kB - 20kB'
-                            elif event['transferSize'] <= 30000:
-                                transfer_size = '20kB - 30kB'
-                            elif event['transferSize'] <= 60000:
-                                transfer_size = '30kB - 60kB'
-                            elif event['transferSize'] > 60000:
-                                transfer_size = '60kB - inf'
-
                         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'].labels(
-                            cache_host, cache_response_type, transfer_size
+                            cache_host, cache_response_type
                         ).observe(value / 1000.0)
                     except (KeyError, ValueError):
                         pass

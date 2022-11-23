@@ -115,16 +115,16 @@ Uncached page view from desktop with isOversample=false:
   - *expected_uncached_desktop
   - frontend.navtiming_group.other:1|c
  metrics:
-   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB'}, 1]
-   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.005'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.01'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.025'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.05'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.075'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.25'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'transfer_size': '30kB - 60kB', 'le': '0.5'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'foo', 'cache_response_type': 'hit-front'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'foo', 'cache_response_type': 'hit-front'}, 0.379]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.005'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.01'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.025'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.05'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.075'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.1'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.5'}, 1]
 
 Uncached page view from desktop with isOversample=false and empty Server Timing data:
  input: {"event": {"action": "history", "connectEnd": 6, "connectStart": 6, "dnsLookup": 1, "domComplete": 1965, "domInteractive": 956, "fetchStart": 1, "isAnon": false, "isHiDPI": false, "isHttp2": true, "isOversample": false, "loadEventEnd": 1968, "loadEventStart": 1965, "mediaWikiLoadEnd": 1270, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "RS", "originRegion": "VO", "pageId": 1, "requestStart": 6, "responseEnd": 415, "responseStart": 380, "revId": 1, "unload": 4, "cacheResponseType": "", "cacheHost": ""}, "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
@@ -132,16 +132,16 @@ Uncached page view from desktop with isOversample=false and empty Server Timing 
   - *expected_uncached_desktop
   - frontend.navtiming_group.other:1|c
  metrics:
-   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown'}, 1]
-   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.005'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.01'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.025'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.05'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.075'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.25'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.5'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 0.379]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.005'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.01'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.025'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.05'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.075'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.1'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.5'}, 1]
 
 Uncached page view from desktop with isOversample=false and missing Server Timing data 2:
  input: {"event": {"action": "history", "connectEnd": 6, "connectStart": 6, "dnsLookup": 1, "domComplete": 1965, "domInteractive": 956, "fetchStart": 1, "isAnon": false, "isHiDPI": false, "isHttp2": true, "isOversample": false, "loadEventEnd": 1968, "loadEventStart": 1965, "mediaWikiLoadEnd": 1270, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "RS", "originRegion": "VO", "pageId": 1, "requestStart": 6, "responseEnd": 415, "responseStart": 380, "revId": 1, "unload": 4}, "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
@@ -149,16 +149,16 @@ Uncached page view from desktop with isOversample=false and missing Server Timin
   - *expected_uncached_desktop
   - frontend.navtiming_group.other:1|c
  metrics:
-   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown'}, 1]
-   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.005'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.01'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.025'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.05'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.075'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.25'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'transfer_size': 'unknown', 'le': '0.5'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 1]
+   - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 0.379]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.005'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.01'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.025'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.05'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.075'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.1'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.5'}, 1]
 
 # Sample from April 2018
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17957960
