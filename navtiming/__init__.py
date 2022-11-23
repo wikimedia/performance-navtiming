@@ -68,7 +68,6 @@ class NavTiming(object):
             'QuickSurveysResponses': self.handle_quick_surveys_responses,
             'QuickSurveyInitiation': self.handle_quick_survey_initiation,
             'PaintTiming': self.handle_paint_timing,
-            'FirstInputTiming': self.handle_first_input_timing,
             'CpuBenchmark': self.handle_cpu_benchmark
         }
 
@@ -196,21 +195,12 @@ class NavTiming(object):
         self.prometheus_counters['painttiming_invalid_events'] = \
             Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
                     ['group'], namespace=namespace)
-        self.prometheus_counters['firstinputtiming_invalid_events'] = \
-            Counter('firstinputtiming_invalid_events', 'Invalid data found when processing FirstInputTiming',
-                    ['group'], namespace=namespace)
         self.prometheus_counters['navtiming_invalid_events'] = \
             Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
                     ['group'], namespace=namespace)
         self.prometheus_counters['savetiming_invalid_events'] = \
             Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
                     ['group'], namespace=namespace)
-        self.prometheus_counters['firstinputdelay_seconds'] = \
-            Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputTiming schema',
-                      ['group', 'ua_family', 'ua_version'],
-                      # Most observed FID values are between 1 and 100ms
-                      buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.5, 1.0, 5.0, 10.0],
-                      namespace=namespace)
         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'Response Start data from NavigationTiming schema by cache host',
@@ -567,33 +557,6 @@ class NavTiming(object):
             yield stat
 
         yield self.make_count('frontend.painttiming_group', group)
-
-    def handle_first_input_timing(self, meta):
-        event = meta['event']
-        wiki = meta['wiki']
-        group = self.wiki_to_group(wiki)
-
-        try:
-            site, auth, ua, continent, country_name, is_oversample = self.get_navigation_timing_context(meta)
-        except Exception:
-            return
-
-        # us is a (family, version) tuple
-        ua_family, ua_version = ua
-
-        fid = event['FID']
-
-        if not self.is_sane_navtiming2(fid):
-            self.prometheus_counters['firstinputtiming_invalid_events'].labels(group).inc()
-            yield self.make_count('frontend.firstinputtiming_discard', 'isSane')
-            return
-
-        self.prometheus_counters['firstinputdelay_seconds'].labels(
-            group, ua_family, ua_version
-        ).observe(fid / 1000.0)
-
-        yield self.make_stat('frontend.firstinputtiming.fid', fid)
-        yield self.make_stat('frontend.firstinputtiming.fid_by_group', group, fid)
 
     def handle_cpu_benchmark(self, meta):
         event = meta['event']

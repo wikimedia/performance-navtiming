@@ -630,21 +630,6 @@ QuickSurveyInitiation:
    - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'eligible'}, 1]
    - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'impression'}, 1]
 
-# Sample from April 2020
-# https://meta.wikimedia.org/w/index.php?title=Schema:FirstInputTiming&oldid=19842486
-FirstInputTiming:
- input:
-  - {"event": {"pageviewToken":"foo","processingStart":28367,"processingEnd":28368,"name":"mousedown","startTime":28347,"duration":184,"FID":20}, "revision":19842486, "schema":"FirstInputTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
- expect:
-  - frontend.firstinputtiming.fid:20|ms
-  - frontend.firstinputtiming.fid_by_group.group1:20|ms
- metrics:
-   - ['firstinputdelay_seconds_count', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 1]
-   - ['firstinputdelay_seconds_sum', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55'}, 0.02]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.005'}, 0]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.01'}, 0]
-   - ['firstinputdelay_seconds_bucket', {'group': 'group1', 'ua_family': 'Firefox', 'ua_version': '55', 'le': '0.025'}, 1]
-
 EventGate:
  input:
   - {"event": {"pageviewToken":"example", "name":"first-paint", "startTime":805, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "schema": "PaintTiming", "webHost": "ca.wikipedia.org", "wiki": "cawiki", "$schema": "/analytics/legacy/painttiming/1.1.0", "meta": {"dt": "2020-04-02T19:11:20.942Z", "stream": "eventlogging_PaintTiming", "id": "b0caf18d-6c7f-4403-947d-2712bbe28610", "request_id": "bd54dd80-7515-11ea-98e5-fd72443e8b45"}, "dt": "2020-04-02T19:11:20.942Z", "http": {"request_headers": {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"}}}
