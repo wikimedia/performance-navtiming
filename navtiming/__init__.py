@@ -185,22 +185,26 @@ class NavTiming(object):
         self.prometheus_counters['errors'] = \
             Counter('errors', 'Unhandled exceptions while processing', namespace=namespace)
 
-        # Handlers
+        # Performance Survey
         self.prometheus_counters['performance_survey_responses'] = \
             Counter('performance_survey_responses', 'Performance survey responses',
                     ['wiki', 'response'], namespace=namespace)
         self.prometheus_counters['performance_survey_initiations'] = \
             Counter('performance_survey_initiations', 'Performance survey initiations',
                     ['wiki', 'event'], namespace=namespace)
+
+        # Validation
         self.prometheus_counters['painttiming_invalid_events'] = \
             Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
-                    ['group'], namespace=namespace)
+                    namespace=namespace)
         self.prometheus_counters['navtiming_invalid_events'] = \
             Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
-                    ['group'], namespace=namespace)
+                    namespace=namespace)
         self.prometheus_counters['savetiming_invalid_events'] = \
             Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
-                    ['group'], namespace=namespace)
+                    namespace=namespace)
+
+        # Navigation Timing and Paint Timing
         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'Response Start data from NavigationTiming schema by cache host',
@@ -482,7 +486,7 @@ class NavTiming(object):
             yield self.make_stat('mw.performance.save', duration)
             yield self.make_stat('mw.performance.save_by_group', group, duration)
         else:
-            self.prometheus_counters['savetiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['savetiming_invalid_events'].inc()
 
     def handle_quick_surveys_responses(self, meta):
         event = meta['event']
@@ -535,12 +539,12 @@ class NavTiming(object):
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
         else:
-            self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['painttiming_invalid_events'].inc()
             yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
             return
 
         if not self.is_sane_navtiming2(value):
-            self.prometheus_counters['painttiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['painttiming_invalid_events'].inc()
             yield self.make_count('frontend.painttiming_discard', 'isSane')
             return
 
@@ -681,7 +685,7 @@ class NavTiming(object):
             return
 
         if not self.is_compliant(event, ua):
-            self.prometheus_counters['navtiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['navtiming_invalid_events'].inc()
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
@@ -737,7 +741,7 @@ class NavTiming(object):
 
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
-            self.prometheus_counters['navtiming_invalid_events'].labels(group).inc()
+            self.prometheus_counters['navtiming_invalid_events'].inc()
             yield self.make_count('frontend.navtiming_discard', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
