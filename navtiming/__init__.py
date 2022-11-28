@@ -234,6 +234,18 @@ class NavTiming(object):
                       ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
                       buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
+        self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'] = \
+            Histogram('painttiming_largestcontentfulpaint_seconds',
+                      'Largest contentful paint from the largest contentful paint API',
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
+                      namespace=namespace)
+        self.prometheus_counters['cumulativelayoutshift_score'] = \
+            Histogram('cumulativelayoutshift_score',
+                      'Cumulative layout shift from the layout shift API',
+                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample'],
+                      buckets=[0.05, 0.1, 0.2, 0.25, 0.3, 0.5, 1.0],
+                      namespace=namespace)
         self.prometheus_counters['cpubenchmark_seconds'] = \
             Histogram('cpubenchmark_seconds', 'CPU benchmarking data from CpuBenchmark schema',
                       ['battery_level', 'ua_family', 'origin_country', 'is_oversample'],
@@ -452,6 +464,9 @@ class NavTiming(object):
 
     def is_sane_navtiming2(self, value):
         return isinstance(value, int) and value >= 0
+
+    def is_sane_cumulative_layout_shift(self, value):
+        return isinstance(value, float) and value >= 0
 
     #
     # Verify that the values in a NavTiming event are in order.
@@ -752,16 +767,26 @@ class NavTiming(object):
         if 'redirecting' in event:
             metrics_nav2['redirect'] = event['redirecting']
 
+        # Cumulative layout shift and largest contentful paint is tagged along with the
+        # navigation timing data
+        if 'cumulativeLayoutShift' in event:
+            metrics_nav2['cumulativeLayoutShift'] = event['cumulativeLayoutShift']
+        if 'largestContentfulPaint' in event:
+            metrics_nav2['largestContentfulPaint'] = event['largestContentfulPaint']
+
         # If we got gaps in the Navigation Timing metrics, collect them
         if 'gaps' in event:
             metrics_nav2['gaps'] = event['gaps']
 
         # If one of the metrics are wrong, don't send them at all
         for metric, value in metrics_nav2.items():
-            isSane = self.is_sane_navtiming2(value)
-            if not isSane:
-                break
-
+            # CLS score is not int so special handling
+            if metric != 'cumulativeLayoutShift':
+                isSane = self.is_sane_navtiming2(value)
+                if not isSane:
+                    break
+            else:
+                isSane = self.is_sane_cumulative_layout_shift(value)
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
             self.prometheus_counters['navtiming_invalid_events'].inc()
@@ -796,6 +821,15 @@ class NavTiming(object):
                         ).observe(value / 1000.0)
                     except (KeyError, ValueError):
                         pass
+
+                if metric == 'cumulativeLayoutShift':
+                    self.prometheus_counters['cumulativelayoutshift_score'].labels(
+                        auth, country_name, continent, ua[0], is_oversample
+                    ).observe(value)
+                if metric == 'largestContentfulPaint':
+                    self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
+                        auth, country_name, continent, ua[0], is_oversample
+                    ).observe(value / 1000.0)
 
             yield self.make_count('frontend.navtiming_group', group)
 
