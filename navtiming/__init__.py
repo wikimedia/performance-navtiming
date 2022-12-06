@@ -568,7 +568,7 @@ class NavTiming(object):
 
         if not self.is_sane_navtiming2(value):
             self.prometheus_counters['painttiming_invalid_events'].inc()
-            yield self.make_count('frontend.painttiming_discard', 'isSane')
+            yield self.make_count('eventlogging.client_errors.PaintTiming', 'isSane')
             return
 
         # PaintTiming is funneled to navtiming2 for backwards compatibility
@@ -765,7 +765,7 @@ class NavTiming(object):
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
             self.prometheus_counters['navtiming_invalid_events'].inc()
-            yield self.make_count('frontend.navtiming_discard', 'isSane')
+            yield self.make_count('eventlogging.client_errors.NavigationTiming', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
                 for stat in self.make_navigation_timing_stats(
