@@ -181,6 +181,38 @@ class NavTiming(object):
             14: 'category',             # Category description pages
         }
 
+        # Define which metrics we take from the Navigation Timing event (+ deltas) and
+        # send to Prometheus
+        self.prometheus_metrics_mapping = {
+            'mediaWikiLoadEnd': 'usertiming_mediawikiloadend_seconds',
+            'domInteractive': 'navigationtiming_dominteractive_seconds',
+            'loadEventEnd': 'navigationtiming_loadeventend_seconds',
+            'responseStart': 'navigationtiming_ttfb_seconds',
+            'tcp': 'navigationtimingdelta_tcp_seconds',
+            'request': 'navigationtimingdelta_request_seconds',
+            'response': 'navigationtimingdelta_response_seconds',
+            'onLoad': 'navigationtimingdelta_onload_seconds',
+            'dns': 'navigationtimingdelta_dns_seconds',
+            'redirect': 'navigationtimingdelta_redirect_seconds'
+        }
+
+        # Two level of buckets, one for the small/early ones and one for late ones
+        navtiming_early_buckets = [.01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 10.0]
+        navtiming_late_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10]
+
+        self.prometheus_bucket_mapping = {
+            'usertiming_mediawikiloadend_seconds': navtiming_late_buckets,
+            'navigationtiming_dominteractive_seconds': navtiming_late_buckets,
+            'navigationtiming_loadeventend_seconds': navtiming_late_buckets,
+            'navigationtiming_ttfb_seconds': navtiming_early_buckets,
+            'navigationtimingdelta_tcp_seconds': navtiming_early_buckets,
+            'navigationtimingdelta_request_seconds': navtiming_late_buckets,
+            'navigationtimingdelta_response_seconds': navtiming_late_buckets,
+            'navigationtimingdelta_onload_seconds': navtiming_late_buckets,
+            'navigationtimingdelta_dns_seconds': navtiming_early_buckets,
+            'navigationtimingdelta_redirect_seconds': navtiming_early_buckets
+        }
+
         self.initialize_prometheus_counters(prometheus_namespace)
 
     def initialize_prometheus_counters(self, namespace):
@@ -230,6 +262,13 @@ class NavTiming(object):
         # * domInteractive    p50-p95 is 0.4s-2.5s with p99 at 20s (Nov 2022)
         # * loadEventEnd      p50-p95 is 0.7s-3.7s with p99 at 30s (Nov 2022)
         # * firstContentPaint p50-p95 is 0.5s-3.0s with p99 at 50s (Nov 2022)
+
+        # The labels we want to use for our navigation timing data that is collected through
+        # the Navigation Timing extension and for paint timings.
+        navigation_timing_labels = [
+            'mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
+            'mw_namespace', 'mw_group', 'mw_skin']
+
         self.prometheus_counters['navtiming_responsestart_by_cache_host_seconds'] = \
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'responseStart from the Navigation Timing API',
@@ -238,22 +277,19 @@ class NavTiming(object):
         self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
             Histogram('painttiming_firstcontentfulpaint_seconds',
                       'first-contentful-paint from the Paint Timing API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
-                       'mw_namespace', 'mw_group', 'mw_skin'],
+                      navigation_timing_labels,
                       buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
         self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'] = \
             Histogram('painttiming_largestcontentfulpaint_seconds',
                       'Largest contentful paint from the largest contentful paint API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
-                       'mw_namespace', 'mw_group', 'mw_skin'],
+                      navigation_timing_labels,
                       buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
                       namespace=namespace)
         self.prometheus_counters['cumulativelayoutshift_score'] = \
             Histogram('cumulativelayoutshift_score',
                       'Cumulative layout shift from the layout shift API',
-                      ['mw_auth', 'geo_country', 'geo_continent', 'ua_family', 'is_oversample', 'mw_action',
-                       'mw_namespace', 'mw_group', 'mw_skin'],
+                      navigation_timing_labels,
                       buckets=[0.05, 0.1, 0.2, 0.25, 0.3, 0.5, 1.0],
                       namespace=namespace)
         self.prometheus_counters['cpubenchmark_seconds'] = \
@@ -262,6 +298,15 @@ class NavTiming(object):
                       # Most observed CPU benchmark times are between 50ms and 500ms
                       buckets=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0],
                       namespace=namespace)
+        # Navigation timing, deltas and user timings
+        for name, prometheus_name in self.prometheus_metrics_mapping.items():
+            self.prometheus_counters[prometheus_name] = \
+                Histogram(
+                        prometheus_name,
+                        'Metric ' + name,
+                        navigation_timing_labels,
+                        buckets=self.prometheus_bucket_mapping[prometheus_name],
+                        namespace=namespace)
 
     def wiki_to_group(self, wiki):
         return self.group_mapping.get(wiki, 'other')
@@ -858,11 +903,16 @@ class NavTiming(object):
                     self.prometheus_counters['cumulativelayoutshift_score'].labels(
                         auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
                     ).observe(value)
-                if metric == 'largestContentfulPaint':
+                elif metric == 'largestContentfulPaint':
                     self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
                         auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
                     ).observe(value / 1000.0)
-
+                else:
+                    # At the moment we just skip firstpaint and gaps
+                    if metric in self.prometheus_metrics_mapping:
+                        self.prometheus_counters[self.prometheus_metrics_mapping[metric]].labels(
+                            auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
+                        ).observe(value / 1000.0)
             yield self.make_count('frontend.navtiming_group', group)
 
     def return_commit_callback(self):
