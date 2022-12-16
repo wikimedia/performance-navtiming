@@ -235,11 +235,6 @@ class NavTiming(object):
                       'responseStart from the Navigation Timing API',
                       ['cache_host', 'cache_response_type'],
                       namespace=namespace)
-        self.prometheus_counters['painttiming_seconds'] = \
-            Histogram('painttiming_seconds', 'Deprecated in favor of painttiming_firstcontentfulpaint_seconds',
-                      ['metric', 'group', 'ua_family'],
-                      buckets=[0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0],
-                      namespace=namespace)
         self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
             Histogram('painttiming_firstcontentfulpaint_seconds',
                       'first-contentful-paint from the Paint Timing API',
@@ -578,12 +573,6 @@ class NavTiming(object):
 
         ua_family, ua_version = ua
         value = event['startTime']
-
-        # TODO: Deprecated, remove soon (T323129)
-        # For old data continuity we have Graphite.
-        self.prometheus_counters['painttiming_seconds'].labels(
-            event['name'], group, ua_family
-        ).observe(value / 1000.0)
 
         if event['name'] == 'first-paint':
             metric = 'firstPaint'
