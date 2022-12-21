@@ -616,7 +616,7 @@ class NavTiming(object):
         group = self.wiki_to_group(wiki)
 
         try:
-            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+            platform, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
                 self.get_navigation_timing_context(meta)
         except Exception:
             return
@@ -643,7 +643,7 @@ class NavTiming(object):
 
         # PaintTiming is funneled to navtiming2 for backwards compatibility
         for stat in self.make_navigation_timing_stats(
-                site,
+                platform,
                 auth,
                 ua,
                 continent,
@@ -659,7 +659,7 @@ class NavTiming(object):
         event = meta['event']
 
         try:
-            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+            platform, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
                 self.get_navigation_timing_context(meta)
         except Exception:
             return
@@ -694,11 +694,11 @@ class NavTiming(object):
 
         if 'mobileMode' in event:
             if event['mobileMode'] == 'stable':
-                site = 'mobile'
+                platform = 'mobile'
             else:
-                site = 'mobile-beta'
+                platform = 'mobile-beta'
         else:
-            site = 'desktop'
+            platform = 'desktop'
         auth = 'anonymous' if event.get('isAnon') else 'authenticated'
 
         if 'skin' in event:
@@ -776,16 +776,16 @@ class NavTiming(object):
                 namespace = self.namespace_mapping.get(event['namespaceId'], 'other')
         else:
             namespace = 'other'
-        return site, auth, ua, continent, country_name, is_oversample, action, namespace, skin
+        return platform, auth, ua, continent, country_name, is_oversample, action, namespace, skin
 
-    def make_navigation_timing_stats(self, site, auth, ua, continent, country_name, is_oversample, metric, value):
+    def make_navigation_timing_stats(self, platform, auth, ua, continent, country_name, is_oversample, metric, value):
         if is_oversample:
             prefix = 'frontend.navtiming2_oversample'
         else:
             prefix = 'frontend.navtiming2'
 
-        yield self.make_stat(prefix, metric, site, auth, value)
-        yield self.make_stat(prefix, metric, site, 'overall', value)
+        yield self.make_stat(prefix, metric, platform, auth, value)
+        yield self.make_stat(prefix, metric, platform, 'overall', value)
         yield self.make_stat(prefix, metric, 'overall', value)
         yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
         yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
@@ -798,7 +798,7 @@ class NavTiming(object):
         group = self.wiki_to_group(wiki)
 
         try:
-            site, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
+            platform, auth, ua, continent, country_name, is_oversample, action, namespace, skin = \
                 self.get_navigation_timing_context(meta)
         except Exception:
             self.log.exception('Exception occured in get_navigation_timing_context')
@@ -876,7 +876,7 @@ class NavTiming(object):
         else:
             for metric, value in metrics_nav2.items():
                 for stat in self.make_navigation_timing_stats(
-                    site,
+                    platform,
                     auth,
                     ua,
                     continent,
