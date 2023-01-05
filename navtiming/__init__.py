@@ -168,7 +168,7 @@ class NavTiming(object):
             'JP': 'Japan',           # 2. JP 8.9%
             'RU': 'Russia',          # 8. RU 2.9%
             'US': 'United States',   # 1. US 20.7%
-            'ZA': 'South Africa'
+            'ZA': 'South Africa',
         }
         # The list of wikis in the groups is non-exhaustive
         self.group_mapping = {
@@ -183,13 +183,7 @@ class NavTiming(object):
         }
 
         self.namespace_mapping = {
-            -1: 'special',              # Special pages
-            0: 'main',                  # "Real" content articles.
-            2: 'user',                  # User pages
-            4: 'project',               # Information about the wiki
-            6: 'file',                  # Media description pages
-            12: 'help',                 # Help pages
-            14: 'category',             # Category description pages
+            0: 'main',                 # "Real" content articles.
         }
 
         # Define which metrics we take from the Navigation Timing event (+ deltas) and
@@ -764,7 +758,7 @@ class NavTiming(object):
             else:
                 action = 'view'
         else:
-            # Special pages do not have any actions but maybe we should call it something else?
+            # Special pages do not have an action
             action = 'other'
 
         # Handle namespaces https://www.mediawiki.org/wiki/Manual:Namespace

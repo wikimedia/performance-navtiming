@@ -68,7 +68,6 @@ class TestNavTiming(unittest.TestCase):
                     # Wrap in list if input is just one event
                     messages = list([case['input']])
                 actual = []
-                # print "---", key # debug
                 for meta in messages:
                     f = self.navtiming.handlers.get(meta['schema'])
                     assert f is not None
@@ -76,9 +75,7 @@ class TestNavTiming(unittest.TestCase):
                     # A handler may only emit Prometheus metrics, in which case it doesn't return anything
                     if result is not None:
                         for stat in result:
-                            # print(stat) # debug
                             actual.append(stat.decode('utf-8'))
-                # print "" # debug
 
                 if len(actual):
                     self.assertCountEqual(
