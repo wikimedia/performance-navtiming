@@ -191,8 +191,8 @@ class NavTiming(object):
         self.prometheus_metrics_mapping = {
             # 'mediaWikiLoadEnd': 'usertiming_mediawikiloadend_seconds',
             # 'domInteractive': 'navigationtiming_dominteractive_seconds',
-            'loadEventEnd': 'navigationtiming_loadeventend_seconds',
-            'responseStart': 'navigationtiming_ttfb_seconds',
+            # 'loadEventEnd': 'navigationtiming_loadeventend_seconds',
+            # 'responseStart': 'navigationtiming_ttfb_seconds',
             # 'tcp': 'navigationtimingdelta_tcp_seconds',
             # 'request': 'navigationtimingdelta_request_seconds',
             # 'response': 'navigationtimingdelta_response_seconds',
