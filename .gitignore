@@ -6,6 +6,7 @@
 build/
 __pycache__/
 .DS_Store
+/events.json
 
 # Deployment
 scap/log

@@ -5,12 +5,23 @@ aggregate metrics to Prometheus and Statsd.
 
 Python 2.7 or 3.10 or later is required.
 
-## Testing
+## Local development
+
+### Testing
 
 1. Ensure [pip](https://pip.pypa.io/en/stable/installing/) is installed. If your system has Python installed without pip (such as on macOS), you can either install it with [EasyInstall](https://setuptools.readthedocs.io/en/latest/easy_install.html) using `sudo easy_install pip`, or choose to install Python locally from Homebrew (which comes with pip).
 2. Ensure [tox](https://tox.readthedocs.io/en/latest/) is installed. Install it with `pip install tox`, or (if pip was installed with sudo) `sudo pip install tox`.
 
 To run the tests, simply run `tox -v`.
+
+### Simulate Kafka locally
+
+To ease local debugging, you can start navtiming locally without Kafka. Use the `--kafka-fixture` option to instead read lines of JSON from a static file. In this mode, it will still formulate Statsd messages and expose a Prometheus client.
+
+```
+$ tox -v
+$ .tox/py3/bin/navtiming --dry-run --kafka-fixture ./events.json
+```
 
 ## Configuration
 

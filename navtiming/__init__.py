@@ -19,6 +19,7 @@ class NavTiming(object):
     def __init__(self,
                  kafka_brokers=None, kafka_security_protocol='PLAINTEXT',
                  kafka_ssl_cafile=None, kafka_consumer_group='navtiming',
+                 kafka_fixture=None,
                  statsd_host='localhost', statsd_port=8125,
                  datacenter=None,
                  etcd_domain=None, etcd_path=None, etcd_refresh=10,
@@ -35,6 +36,7 @@ class NavTiming(object):
         self.kafka_consumer_group = kafka_consumer_group
         self.kafka_security_protocol = kafka_security_protocol
         self.kafka_ssl_cafile = kafka_ssl_cafile
+        self.kafka_fixture = kafka_fixture
         self.statsd_host = statsd_host
         self.statsd_port = statsd_port
         self.verbose = verbose
@@ -933,11 +935,17 @@ class NavTiming(object):
                 self.log.debug('Committed offsets [{}]'.format(offsets))
         return commit_callback
 
-    def run(self):
-        self.statsd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+    def get_kafka_iterator(self):
         kafka_bootstrap_servers = tuple(self.kafka_brokers)
         kafka_topics = ['eventlogging_' + key for key in self.handlers.keys()]
+
+        if self.kafka_fixture:
+            with open(self.kafka_fixture) as fixture_file:
+                for line in fixture_file:
+                    yield line
+            self.log.info('Reached end of kafka fixture file, going to sleep for 1 hour...')
+            time.sleep(3600)
+            return
 
         consumer = None
         while True:
@@ -946,13 +954,14 @@ class NavTiming(object):
                     time.sleep(self.etcd_refresh + 1)
                     self.log.info('Checking whether datacenter has been promoted')
                     continue
+
                 self.log.info('Starting Kafka connection to brokers ({})'.format(
-                                             kafka_bootstrap_servers))
+                              kafka_bootstrap_servers))
                 consumer = KafkaConsumer(
                     bootstrap_servers=kafka_bootstrap_servers,
                     security_protocol=self.kafka_security_protocol,
                     ssl_cafile=self.kafka_ssl_cafile,
-                    # We use the cluster name instead of the hostname as CN.
+                    # WMF Kafka uses the cluster name as CN (instead of hostname).
                     ssl_check_hostname=False,
                     group_id=self.kafka_consumer_group,
                     auto_offset_reset='latest',
@@ -961,18 +970,16 @@ class NavTiming(object):
                 )
 
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
-
                 # This is a quirk of the library where this call triggers actually fetching
                 # the metadata, whereas partitions_for_topic doesn't
                 # https://github.com/dpkp/kafka-python/issues/1774
                 consumer.topics()
-
                 assignments = []
                 for topic in kafka_topics:
                     self.log.info('Fetching partitions for topic: {}'.format(topic))
                     partitions = consumer.partitions_for_topic(topic)
-
-                    # Safety net in case partitions_for_topic failed, but shouldn't happen whend primed with .topics()
+                    # Safety net in case partitions_for_topic failed,
+                    # but shouldn't happen whend primed with .topics()
                     if partitions is None:
                         self.log.info('No partitions found for topic: {}, defaulting to partition 0'.format(topic))
                         assignments.append(TopicPartition(topic, 0))
@@ -984,33 +991,18 @@ class NavTiming(object):
                 consumer.assign(assignments)
                 consumer.seek_to_end()
 
-                self.log.info('Starting NavTiming Kafka consumer')
-
+                self.log.info('Starting Kafka consumer')
                 for message in consumer:
                     # Check whether we should be running
                     if not self.is_master():
                         self.log.info('No longer running in the master datacenter')
-                        self.log.info('Stopping consuming')
+                        self.log.info('Stopping Kafka consumer')
                         if consumer is not None:
                             consumer.close()
                         break
-                    self.prometheus_counters['consumed_messages'].inc()
-                    meta = json.loads(message.value.decode('utf-8'))
 
-                    # Canary events are fake events used to monitor the event pipeline
-                    if 'meta' in meta and 'domain' in meta['meta'] and meta['meta']['domain'] == 'canary':
-                        self.log.info('Canary event')
-                        continue
+                    yield message.value.decode('utf-8')
 
-                    if 'schema' in meta:
-                        f = self.handlers.get(meta['schema'])
-                        if f is not None:
-                            self.prometheus_counters['handled_messages'].labels(meta['schema']).inc()
-                            self.prometheus_counters['latest_handled_time_seconds'].labels(
-                                meta['schema']
-                            ).set_to_current_time()
-                            for stat in f(meta):
-                                self.dispatch_stat(stat)
             except KeyboardInterrupt:
                 self.log.info('Stopping the Kafka consumer and shutting down')
                 consumer.close()
@@ -1019,6 +1011,28 @@ class NavTiming(object):
                 self.prometheus_counters['errors'].inc()
                 self.log.exception('Unhandled exception in main loop, restarting consumer')
 
+    def run(self):
+        self.statsd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        for line in self.get_kafka_iterator():
+            self.prometheus_counters['consumed_messages'].inc()
+            meta = json.loads(line)
+
+            # Canary events are fake events used to monitor the event pipeline
+            if 'meta' in meta and 'domain' in meta['meta'] and meta['meta']['domain'] == 'canary':
+                self.log.info('Canary event')
+                continue
+
+            if 'schema' in meta:
+                f = self.handlers.get(meta['schema'])
+                if f is not None:
+                    self.prometheus_counters['handled_messages'].labels(meta['schema']).inc()
+                    self.prometheus_counters['latest_handled_time_seconds'].labels(
+                        meta['schema']
+                    ).set_to_current_time()
+                    for stat in f(meta):
+                        self.dispatch_stat(stat)
+
 
 def main(cluster=None, config=None):
     parsed_configs = {}
@@ -1026,10 +1040,14 @@ def main(cluster=None, config=None):
         parsed_configs = config[cluster]
 
     ap = argparse.ArgumentParser(description='NavigationTiming subscriber')
-    ap.add_argument('--brokers',
-                    required=False if parsed_configs.get('brokers') else True,
-                    default=parsed_configs.get('brokers'),
+
+    ka = ap.add_mutually_exclusive_group(required=False if parsed_configs.get('brokers') else True)
+    ka.add_argument('--brokers',
+                    default=parsed_configs.get('brokers', ''),
                     help='Comma-separated list of kafka brokers')
+    ka.add_argument('--kafka-fixture',
+                    default=None,
+                    help='Filename to simulate a Kafka consumer that reads lines from a fixture')
     ap.add_argument('--security-protocol',
                     default=parsed_configs.get('security_protocol', 'PLAINTEXT'),
                     help='Protocol used to communicate with Kafka brokers. '
@@ -1038,8 +1056,7 @@ def main(cluster=None, config=None):
                     default=parsed_configs.get('ssl_cafile'),
                     help='Optional filename of certificate authority file to use in certificate verification')
     ap.add_argument('--consumer-group',
-                    required=False if parsed_configs.get('consumer_group') else True,
-                    default=parsed_configs.get('consumer_group'),
+                    default=parsed_configs.get('consumer_group', 'navtiming'),
                     help='Consumer group to register with Kafka')
     ap.add_argument('--statsd-host',
                     default=parsed_configs.get('statsd_host', 'localhost'),
@@ -1090,6 +1107,7 @@ def main(cluster=None, config=None):
                    kafka_security_protocol=args.security_protocol,
                    kafka_ssl_cafile=args.ssl_cafile,
                    kafka_consumer_group=args.consumer_group,
+                   kafka_fixture=args.kafka_fixture,
                    statsd_host=args.statsd_host,
                    statsd_port=args.statsd_port,
                    datacenter=args.datacenter,
