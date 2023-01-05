@@ -506,7 +506,7 @@ class NavTiming(object):
         if self.statsd_sock and self.statsd_addr and not self.dry_run:
             self.statsd_sock.sendto(stat, self.statsd_addr)
         else:
-            self.log.info(stat)
+            self.log.debug(stat)
 
     def make_stat(self, *args, value):
         """
