@@ -198,30 +198,26 @@ class NavTiming(object):
             # 'mediaWikiLoadEnd': 'usertiming_mediawikiloadend_seconds',
             # 'domInteractive': 'navigationtiming_dominteractive_seconds',
             'loadEventEnd': 'navigationtiming_loadeventend_seconds',
-            'responseStart': 'navigationtiming_ttfb_seconds',
+            'responseStart': 'navigationtiming_responsestart_seconds',
             # 'tcp': 'navigationtimingdelta_tcp_seconds',
-            # 'request': 'navigationtimingdelta_request_seconds',
-            # 'response': 'navigationtimingdelta_response_seconds',
             # 'onLoad': 'navigationtimingdelta_onload_seconds',
             # 'dns': 'navigationtimingdelta_dns_seconds',
             # 'redirect': 'navigationtimingdelta_redirect_seconds'
         }
 
         # Two level of buckets, one for the small/early ones and one for late ones
-        navtiming_early_buckets = [.01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 10.0]
-        navtiming_late_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10]
+        self.navtiming_low_buckets = [.01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5]
+        self.navtiming_high_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10]
 
         self.prometheus_bucket_mapping = {
-            # 'usertiming_mediawikiloadend_seconds': navtiming_late_buckets,
-            # 'navigationtiming_dominteractive_seconds': navtiming_late_buckets,
-            'navigationtiming_loadeventend_seconds': navtiming_late_buckets,
-            'navigationtiming_ttfb_seconds': navtiming_early_buckets,
-            # 'navigationtimingdelta_tcp_seconds': navtiming_early_buckets,
-            # 'navigationtimingdelta_request_seconds': navtiming_late_buckets,
-            # 'navigationtimingdelta_response_seconds': navtiming_late_buckets,
-            # 'navigationtimingdelta_onload_seconds': navtiming_late_buckets,
-            # 'navigationtimingdelta_dns_seconds': navtiming_early_buckets,
-            # 'navigationtimingdelta_redirect_seconds': navtiming_early_buckets
+            # 'usertiming_mediawikiloadend_seconds': self.navtiming_high_buckets,
+            # 'navigationtiming_dominteractive_seconds': self.navtiming_high_buckets,
+            'navigationtiming_loadeventend_seconds': self.navtiming_high_buckets,
+            'navigationtiming_responsestart_seconds': self.navtiming_low_buckets,
+            # 'navigationtimingdelta_tcp_seconds': self.navtiming_low_buckets,
+            # 'navigationtimingdelta_onload_seconds': self.navtiming_low_buckets,
+            # 'navigationtimingdelta_dns_seconds': self.navtiming_low_buckets,
+            # 'navigationtimingdelta_redirect_seconds': self.navtiming_low_buckets
         }
 
         self.initialize_prometheus_counters(prometheus_namespace)
@@ -267,7 +263,7 @@ class NavTiming(object):
         # and give them the same kind of accuracy and breakdown.
         #
         # Early stage:
-        # * responseStart     p50-p95 is 0.2s-1.3s with p99 at 5s (Nov 2022)
+        # * responseStart     p50-p95 is 0.2s-1.2s with p99 at 3s (Dec 2022)
         #
         # Late stage:
         # * domInteractive    p50-p95 is 0.4s-2.5s with p99 at 20s (Nov 2022)
@@ -284,18 +280,19 @@ class NavTiming(object):
             Histogram('navtiming_responsestart_by_cache_host_seconds',
                       'responseStart from the Navigation Timing API',
                       ['cache_host', 'cache_response_type'],
+                      buckets=self.navtiming_low_buckets,
                       namespace=namespace)
         self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
             Histogram('painttiming_firstcontentfulpaint_seconds',
                       'first-contentful-paint from the Paint Timing API',
                       navigation_timing_labels,
-                      buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
+                      buckets=self.navtiming_high_buckets,
                       namespace=namespace)
         self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'] = \
             Histogram('painttiming_largestcontentfulpaint_seconds',
                       'Largest contentful paint from the largest contentful paint API',
                       navigation_timing_labels,
-                      buckets=[0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10],
+                      buckets=self.navtiming_high_buckets,
                       namespace=namespace)
         self.prometheus_counters['cumulativelayoutshift_score'] = \
             Histogram('cumulativelayoutshift_score',
