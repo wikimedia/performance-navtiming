@@ -508,12 +508,10 @@ class NavTiming(object):
         else:
             self.log.info(stat)
 
-    def make_stat(self, *args):
+    def make_stat(self, *args, value):
         """
         Create a statsd packet for adding a measure to a Timing metric
         """
-        args = list(args)
-        value = args.pop()
         name = '.'.join(arg.replace(' ', '_') for arg in args)
         stat = '%s:%s|ms' % (name, value)
         return stat.encode('utf-8')
@@ -522,7 +520,6 @@ class NavTiming(object):
         """
         Create a statsd packet for incrementing a Counter metric
         """
-        args = list(args)
         value = 1
         name = '.'.join(arg.replace(' ', '_') for arg in args)
         stat = '%s:%s|c' % (name, value)
@@ -582,8 +579,8 @@ class NavTiming(object):
         duration = event.get('saveTiming')
         group = self.wiki_to_group(wiki)
         if duration is not None:
-            yield self.make_stat('mw.performance.save', duration)
-            yield self.make_stat('mw.performance.save_by_group', group, duration)
+            yield self.make_stat('mw.performance.save', value=duration)
+            yield self.make_stat('mw.performance.save_by_group', group, value=duration)
         else:
             self.prometheus_counters['savetiming_invalid_events'].inc()
 
@@ -790,13 +787,13 @@ class NavTiming(object):
         else:
             prefix = 'frontend.navtiming2'
 
-        yield self.make_stat(prefix, metric, platform, auth, value)
-        yield self.make_stat(prefix, metric, platform, 'overall', value)
-        yield self.make_stat(prefix, metric, 'overall', value)
-        yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value)
-        yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value)
-        yield self.make_stat(prefix, metric, 'by_continent', continent, value)
-        yield self.make_stat(prefix, metric, 'by_country', country_name, value)
+        yield self.make_stat(prefix, metric, platform, auth, value=value)
+        yield self.make_stat(prefix, metric, platform, 'overall', value=value)
+        yield self.make_stat(prefix, metric, 'overall', value=value)
+        yield self.make_stat(prefix, metric, 'by_browser', ua[0], ua[1], value=value)
+        yield self.make_stat(prefix, metric, 'by_browser', ua[0], 'all', value=value)
+        yield self.make_stat(prefix, metric, 'by_continent', continent, value=value)
+        yield self.make_stat(prefix, metric, 'by_country', country_name, value=value)
 
     def handle_navigation_timing(self, meta):
         event = meta['event']
