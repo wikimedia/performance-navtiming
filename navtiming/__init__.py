@@ -16,21 +16,25 @@ from ua_parser import user_agent_parser
 
 
 class NavTiming(object):
-    def __init__(self, brokers=None, consumer_group='navtiming',
-                 statsd_host='localhost', statsd_port=8125, datacenter=None,
-                 etcd_domain=None, etcd_path=None, etcd_refresh=10, verbose=False,
-                 dry_run=False, prometheus_namespace='webperf',
-                 security_protocol='PLAINTEXT', ssl_cafile=None):
-        if brokers is None:
-            if security_protocol in ('SSL', 'SASL_SSL'):
-                self.brokers = ('localhost:9093',)
+    def __init__(self,
+                 kafka_brokers=None, kafka_security_protocol='PLAINTEXT',
+                 kafka_ssl_cafile=None, kafka_consumer_group='navtiming',
+                 statsd_host='localhost', statsd_port=8125,
+                 datacenter=None,
+                 etcd_domain=None, etcd_path=None, etcd_refresh=10,
+                 prometheus_namespace='webperf',
+                 verbose=False,
+                 dry_run=False):
+        if kafka_brokers is None:
+            if kafka_security_protocol in ('SSL', 'SASL_SSL'):
+                self.kafka_brokers = ('localhost:9093',)
             else:
-                self.brokers = ('localhost:9092',)
+                self.kafka_brokers = ('localhost:9092',)
         else:
-            self.brokers = brokers
-        self.consumer_group = consumer_group
-        self.security_protocol = security_protocol
-        self.ssl_cafile = ssl_cafile
+            self.kafka_brokers = kafka_brokers
+        self.kafka_consumer_group = kafka_consumer_group
+        self.kafka_security_protocol = kafka_security_protocol
+        self.kafka_ssl_cafile = kafka_ssl_cafile
         self.statsd_host = statsd_host
         self.statsd_port = statsd_port
         self.verbose = verbose
@@ -59,8 +63,8 @@ class NavTiming(object):
         else:
             self.etcd = None
 
-        self.addr = self.statsd_host, self.statsd_port
-        self.sock = None
+        self.statsd_addr = self.statsd_host, self.statsd_port
+        self.statsd_sock = None
 
         self.handlers = {
             'NavigationTiming': self.handle_navigation_timing,
@@ -497,8 +501,8 @@ class NavTiming(object):
         return (browser_family, version)
 
     def dispatch_stat(self, stat):
-        if self.sock and self.addr and not self.dry_run:
-            self.sock.sendto(stat, self.addr)
+        if self.statsd_sock and self.statsd_addr and not self.dry_run:
+            self.statsd_sock.sendto(stat, self.statsd_addr)
         else:
             self.log.info(stat)
 
@@ -920,7 +924,7 @@ class NavTiming(object):
 
             yield self.make_count('frontend.navtiming_group', group)
 
-    def return_commit_callback(self):
+    def kafka_return_commit_callback(self):
         # Closure so that log config carries over
         def commit_callback(offsets, response):
             if isinstance(response, Exception):
@@ -930,9 +934,9 @@ class NavTiming(object):
         return commit_callback
 
     def run(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.statsd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        kafka_bootstrap_servers = tuple(self.brokers)
+        kafka_bootstrap_servers = tuple(self.kafka_brokers)
         kafka_topics = ['eventlogging_' + key for key in self.handlers.keys()]
 
         consumer = None
@@ -946,14 +950,14 @@ class NavTiming(object):
                                              kafka_bootstrap_servers))
                 consumer = KafkaConsumer(
                     bootstrap_servers=kafka_bootstrap_servers,
-                    security_protocol=self.security_protocol,
-                    ssl_cafile=self.ssl_cafile,
+                    security_protocol=self.kafka_security_protocol,
+                    ssl_cafile=self.kafka_ssl_cafile,
                     # We use the cluster name instead of the hostname as CN.
                     ssl_check_hostname=False,
-                    group_id=self.consumer_group,
+                    group_id=self.kafka_consumer_group,
                     auto_offset_reset='latest',
                     enable_auto_commit=True,
-                    default_offset_commit_callback=self.return_commit_callback()
+                    default_offset_commit_callback=self.kafka_return_commit_callback()
                 )
 
                 self.log.info('Subscribing to topics: {}'.format(kafka_topics))
@@ -1082,10 +1086,10 @@ def main(cluster=None, config=None):
                     help='Dry-run (don\'t actually submit to statsd)')
     args = ap.parse_args()
 
-    nt = NavTiming(brokers=args.brokers.split(','),
-                   security_protocol=args.security_protocol,
-                   ssl_cafile=args.ssl_cafile,
-                   consumer_group=args.consumer_group,
+    nt = NavTiming(kafka_brokers=args.brokers.split(','),
+                   kafka_security_protocol=args.security_protocol,
+                   kafka_ssl_cafile=args.ssl_cafile,
+                   kafka_consumer_group=args.consumer_group,
                    statsd_host=args.statsd_host,
                    statsd_port=args.statsd_port,
                    datacenter=args.datacenter,
