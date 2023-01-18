@@ -186,6 +186,21 @@ class NavTiming(object):
             0: 'main',                 # "Real" content articles.
         }
 
+        # We reducae cardinality in Prometheus and when we remove Graphite
+        # we can do this directly in the ua logic
+        self.browser_family_mapping = {
+            'Chrome': 'Chrome',
+            'Chrome_Mobile': 'Chrome',
+            'Chrome_Mobile_iOS': 'iOS_other',
+            'Chromium': 'Chrome',
+            'Safari': 'Safari',
+            'Mobile_Safari': 'Safari',
+            'Firefox': 'Firefox',
+            'Firefox_mobile': 'Firefox',
+            'Edge': 'Edge',
+            'iOS_other': 'iOS_other'
+        }
+
         # Define which metrics we take from the Navigation Timing event (+ deltas) and
         # send to Prometheus
         self.prometheus_metrics_mapping = {
@@ -616,6 +631,9 @@ class NavTiming(object):
             return
 
         ua_family, ua_version = ua
+        # Map for Prometheus
+        browser_family = self.browser_family_mapping.get(ua_family, 'Other')
+
         value = event['startTime']
 
         if event['name'] == 'first-paint':
@@ -623,7 +641,7 @@ class NavTiming(object):
         elif event['name'] == 'first-contentful-paint':
             metric = 'firstContentfulPaint'
             self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'].labels(
-                auth, country_name, continent, ua_family, is_oversample, action, namespace, group, skin
+                auth, country_name, continent, browser_family, is_oversample, action, namespace, group, skin
             ).observe(value / 1000.0)
         else:
             self.prometheus_counters['painttiming_invalid_events'].inc()
@@ -881,6 +899,9 @@ class NavTiming(object):
                 ):
                     yield stat
 
+                # Map for Prometheus
+                browser_family = self.browser_family_mapping.get(ua[0], 'Other')
+
                 if metric == 'responseStart' and not is_oversample:
                     try:
                         cache_response_type = 'unknown'
@@ -900,16 +921,16 @@ class NavTiming(object):
 
                 if metric == 'cumulativeLayoutShift':
                     self.prometheus_counters['cumulativelayoutshift_score'].labels(
-                        auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
+                        auth, country_name, continent, browser_family, is_oversample, action, namespace, group, skin
                     ).observe(value)
                 elif metric == 'largestContentfulPaint':
                     self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
-                        auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
+                        auth, country_name, continent, browser_family, is_oversample, action, namespace, group, skin
                     ).observe(value / 1000.0)
                 else:
                     if metric in self.prometheus_metrics_mapping:
                         self.prometheus_counters[self.prometheus_metrics_mapping[metric]].labels(
-                            auth, country_name, continent, ua[0], is_oversample, action, namespace, group, skin
+                            auth, country_name, continent, browser_family, is_oversample, action, namespace, group, skin
                         ).observe(value / 1000.0)
 
             yield self.make_count('frontend.navtiming_group', group)
