@@ -3,7 +3,7 @@
 The navtiming service processes web beacons containing performance data from web browsers, and submits
 aggregate metrics to Prometheus and Statsd.
 
-Python 2.7 or 3.10 or later is required.
+Python 3.9 or later is required.
 
 ## Local development
 
