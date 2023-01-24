@@ -708,7 +708,7 @@ class NavTiming(object):
             platform = 'desktop'
         auth = 'anonymous' if event.get('isAnon') else 'authenticated'
 
-        if 'skin' in event:
+        if 'skin' in event and event['skin'] in ('vector', 'vector-2022', 'minerva', 'timeless'):
             skin = event['skin']
         else:
             skin = 'unknown'
