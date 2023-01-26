@@ -200,14 +200,14 @@ class NavTiming(object):
         # Define which metrics we take from the Navigation Timing event (+ deltas) and
         # send to Prometheus
         self.prometheus_metrics_mapping = {
-            # 'mediaWikiLoadEnd': 'usertiming_mediawikiloadend_seconds',
+            'mediaWikiLoadEnd': 'usertiming_mediawikiloadend_seconds',
             'domInteractive': 'navigationtiming_dominteractive_seconds',
             'loadEventEnd': 'navigationtiming_loadeventend_seconds',
             'responseStart': 'navigationtiming_responsestart_seconds',
-            # 'tcp': 'navigationtimingdelta_tcp_seconds',
+            'tcp': 'navigationtimingdelta_tcp_seconds',
             'onLoad': 'navigationtimingdelta_onload_seconds',
-            # 'dns': 'navigationtimingdelta_dns_seconds',
-            # 'redirect': 'navigationtimingdelta_redirect_seconds'
+            'dns': 'navigationtimingdelta_dns_seconds',
+            'redirect': 'navigationtimingdelta_redirect_seconds'
         }
 
         # Two level of buckets, one for the small/early ones and one for late ones
@@ -215,14 +215,14 @@ class NavTiming(object):
         self.navtiming_high_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10]
 
         self.prometheus_bucket_mapping = {
-            # 'usertiming_mediawikiloadend_seconds': self.navtiming_high_buckets,
+            'usertiming_mediawikiloadend_seconds': self.navtiming_high_buckets,
             'navigationtiming_dominteractive_seconds': self.navtiming_high_buckets,
             'navigationtiming_loadeventend_seconds': self.navtiming_high_buckets,
             'navigationtiming_responsestart_seconds': self.navtiming_low_buckets,
-            # 'navigationtimingdelta_tcp_seconds': self.navtiming_low_buckets,
+            'navigationtimingdelta_tcp_seconds': self.navtiming_low_buckets,
             'navigationtimingdelta_onload_seconds': self.navtiming_low_buckets,
-            # 'navigationtimingdelta_dns_seconds': self.navtiming_low_buckets,
-            # 'navigationtimingdelta_redirect_seconds': self.navtiming_low_buckets
+            'navigationtimingdelta_dns_seconds': self.navtiming_low_buckets,
+            'navigationtimingdelta_redirect_seconds': self.navtiming_low_buckets
         }
 
         self.initialize_prometheus_counters(prometheus_namespace)
