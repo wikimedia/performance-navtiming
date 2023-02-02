@@ -225,6 +225,13 @@ class NavTiming(object):
             'navigationtimingdelta_redirect_seconds': self.navtiming_low_buckets
         }
 
+        # Informatiom from the Network Information API
+        # https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
+        self.network_effective_types = ['slow-2g', '2g', '3g', '4g']
+
+        # https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type
+        self.network_types = ['wifi', 'ethernet', 'cellular']
+
         self.initialize_prometheus_counters(prometheus_namespace)
 
     def initialize_prometheus_counters(self, namespace):
@@ -248,6 +255,12 @@ class NavTiming(object):
         self.prometheus_counters['performance_survey_initiations'] = \
             Counter('performance_survey_initiations', 'Performance survey initiations',
                     ['wiki', 'event'], namespace=namespace)
+
+        # Network info
+        network_labels = ['network_type', 'network_effectivetype', 'geo_country', 'platform', 'is_oversample']
+        self.prometheus_counters['network_information'] = \
+            Counter('network_information', 'Network information from the Network API',
+                    network_labels, namespace=namespace)
 
         # Validation
         self.prometheus_counters['painttiming_invalid_events'] = \
@@ -915,6 +928,23 @@ class NavTiming(object):
                         self.prometheus_counters[self.prometheus_metrics_mapping[metric]].labels(
                             mw_context, country_name, continent, browser_family, is_oversample, group, skin
                         ).observe(value / 1000.0)
+
+            # We have network information from a browser that supports the API
+            if 'netinfoEffectiveConnectionType' in event and \
+                    'netinfoConnectionType' in event:
+
+                network_type = 'other' if event['netinfoConnectionType'] not in self.network_types \
+                    else event['netinfoConnectionType']
+                network_effective_type = 'other' if event['netinfoEffectiveConnectionType'] not in \
+                    self.network_effective_types else event['netinfoEffectiveConnectionType']
+
+                self.prometheus_counters['network_information'].labels(
+                    network_type, network_effective_type, country_name, platform, is_oversample
+                ).inc()
+            else:
+                self.prometheus_counters['network_information'].labels(
+                    'unknown', 'unknown', country_name, platform, is_oversample
+                ).inc()
 
             yield self.make_count('frontend.navtiming_group', group)
 
