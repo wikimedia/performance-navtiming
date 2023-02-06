@@ -253,9 +253,10 @@ class NavTiming(object):
         self.prometheus_counters['painttiming_invalid_events'] = \
             Counter('painttiming_invalid_events', 'Invalid data found when processing PaintTiming',
                     namespace=namespace)
-        self.prometheus_counters['navtiming_invalid_events'] = \
-            Counter('navtiming_invalid_events', 'Invalid data found when processing NavTiming',
-                    namespace=namespace)
+        self.prometheus_counters['navigationtiming_invalid_events'] = \
+            Counter('navigationtiming_invalid_events',
+                    'Invalid data found when processing NavigationTiming',
+                    ['error_type'], namespace=namespace)
         self.prometheus_counters['savetiming_invalid_events'] = \
             Counter('savetiming_invalid_events', 'Invalid data found when processing saveTiming',
                     namespace=namespace)
@@ -799,7 +800,7 @@ class NavTiming(object):
             return
 
         if not self.is_compliant(event, ua):
-            self.prometheus_counters['navtiming_invalid_events'].inc()
+            self.prometheus_counters['navigationtiming_invalid_events'].labels('metrics_out_of_order').inc()
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'nonCompliant')
             return
 
@@ -865,7 +866,7 @@ class NavTiming(object):
                 isSane = self.is_sane_cumulative_layout_shift(value)
         # If one of the metrics are under the min then skip it entirely
         if not isSane:
-            self.prometheus_counters['navtiming_invalid_events'].inc()
+            self.prometheus_counters['navigationtiming_invalid_events'].labels('metrics_below_zero').inc()
             yield self.make_count('eventlogging.client_errors.NavigationTiming', 'isSane')
         else:
             for metric, value in metrics_nav2.items():
