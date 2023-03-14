@@ -324,6 +324,18 @@ class NavTiming(object):
                       # Most observed CPU benchmark times are between 50ms and 500ms in the US
                       buckets=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0, 2.0, 5.0],
                       namespace=namespace)
+        self.prometheus_counters['longtask_totalduration_seconds'] = \
+            Histogram('longtask_totalduration_seconds',
+                      'total duration of longtask',
+                      navigation_timing_labels,
+                      buckets=self.navtiming_high_buckets,
+                      namespace=namespace)
+        self.prometheus_counters['longtask_totaltasks'] = \
+            Histogram('longtask_totaltasks',
+                      'total entries of longtask ',
+                      navigation_timing_labels,
+                      buckets=[1, 3, 6, 10, 15, 20],
+                      namespace=namespace)
         # Navigation timing, deltas and user timings
         for name, prometheus_name in self.prometheus_metrics_mapping.items():
             self.prometheus_counters[prometheus_name] = \
@@ -863,6 +875,10 @@ class NavTiming(object):
             metrics_nav2['cumulativeLayoutShift'] = event['cumulativeLayoutShift']
         if 'largestContentfulPaint' in event:
             metrics_nav2['largestContentfulPaint'] = event['largestContentfulPaint']
+        if 'longTaskTotalDuration' in event:
+            metrics_nav2['longTaskTotalDuration'] = event['longTaskTotalDuration']
+        if 'longTaskTotalTasks' in event:
+            metrics_nav2['longTaskTotalTasks'] = event['longTaskTotalTasks']
 
         # If we got gaps in the Navigation Timing metrics, collect them
         if 'gaps' in event:
@@ -923,6 +939,14 @@ class NavTiming(object):
                     self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
                         mw_context, country_name, continent, browser_family, is_oversample, group, skin
                     ).observe(value / 1000.0)
+                elif metric == 'longTaskTotalDuration':
+                    self.prometheus_counters['longtask_totalduration_seconds'].labels(
+                        mw_context, country_name, continent, browser_family, is_oversample, group, skin
+                    ).observe(value / 1000.0)
+                elif metric == 'longTaskTotalTasks':
+                    self.prometheus_counters['longtask_totaltasks'].labels(
+                        mw_context, country_name, continent, browser_family, is_oversample, group, skin
+                    ).observe(value)
                 else:
                     if metric in self.prometheus_metrics_mapping:
                         self.prometheus_counters[self.prometheus_metrics_mapping[metric]].labels(

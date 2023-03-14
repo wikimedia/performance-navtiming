@@ -658,10 +658,10 @@ First contentful paint:
   metrics:
     - ['painttiming_firstcontentfulpaint_seconds_count', {'mw_context': 'anonymous_talk_view', 'geo_country': 'Japan', 'geo_continent': 'Asia', 'ua_family': 'Chrome', 'is_oversample': 'False', 'mw_group': 'group2', 'mw_skin': 'vector'}, 1]
 
-# Sample from 13/12-2022
-Largest contentful paint, Cumulative layout shift and network info:
+# Sample from 13/12-2022 (modified to add longtask)
+Largest contentful paint, Cumulative layout shift, network info and longtask:
  input:
-  - {"event":{"pageviewToken":"example","isAnon":true,"isOversample":false,"mobileMode":"stable","originCountry":"US","mediaWikiVersion":"1.40.0-wmf.13","skin":"minerva","namespaceId":0,"revId":1,"action":"view","mediaWikiLoadEnd":1409,"netinfoEffectiveConnectionType":"4g","netinfoConnectionType":"wifi","netinfoRtt":50,"netinfoDownlink":1.7,"deviceMemory":8,"hardwareConcurrency":8,"cumulativeLayoutShift":0,"largestContentfulPaint":387,"largestContentfulPaintElement":"P","connectEnd":25,"connectStart":25,"domComplete":1229,"domInteractive":387,"fetchStart":25,"loadEventEnd":1229,"loadEventStart":1229,"requestStart":28,"responseEnd":217,"responseStart":189,"secureConnectionStart":0,"dnsLookup":0,"redirecting":0,"unload":0,"gaps":3,"transferSize":16019,"cacheResponseType":"miss","cacheHost":"cp1087"},"schema":"NavigationTiming","webHost":"example","wiki":"enwiki","$schema":"/analytics/legacy/navigationtiming/1.3.0","client_dt":"2022-12-13T05:06:44.588Z","meta":{"stream":"eventlogging_NavigationTiming","domain":"en.wikipedia.org","id":"75af608f-41ed-49f1-b789-14a99c22cf78","dt":"2022-12-13T05:07:03.922Z","request_id":"31aa0676-a60f-4672-8b89-28df6f5b0a8d"},"dt":"2022-12-13T05:07:03.922Z","http":{"request_headers":{"user-agent":"Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36"},"client_ip":"1.1.1.1"}}
+  - {"event":{"pageviewToken":"example","isAnon":true,"isOversample":false,"mobileMode":"stable","originCountry":"US","mediaWikiVersion":"1.40.0-wmf.13","skin":"minerva","namespaceId":0,"revId":1,"action":"view","mediaWikiLoadEnd":1409,"netinfoEffectiveConnectionType":"4g","netinfoConnectionType":"wifi","netinfoRtt":50,"netinfoDownlink":1.7,"deviceMemory":8,"hardwareConcurrency":8,"cumulativeLayoutShift":0,"largestContentfulPaint":387,"largestContentfulPaintElement":"P","longTaskTotalDuration":189,"longTaskTotalTasks":5,"connectEnd":25,"connectStart":25,"domComplete":1229,"domInteractive":387,"fetchStart":25,"loadEventEnd":1229,"loadEventStart":1229,"requestStart":28,"responseEnd":217,"responseStart":189,"secureConnectionStart":0,"dnsLookup":0,"redirecting":0,"unload":0,"gaps":3,"transferSize":16019,"cacheResponseType":"miss","cacheHost":"cp1087"},"schema":"NavigationTiming","webHost":"example","wiki":"enwiki","$schema":"/analytics/legacy/navigationtiming/1.4.0","client_dt":"2022-12-13T05:06:44.588Z","meta":{"stream":"eventlogging_NavigationTiming","domain":"en.wikipedia.org","id":"75af608f-41ed-49f1-b789-14a99c22cf78","dt":"2022-12-13T05:07:03.922Z","request_id":"31aa0676-a60f-4672-8b89-28df6f5b0a8d"},"dt":"2022-12-13T05:07:03.922Z","http":{"request_headers":{"user-agent":"Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36"},"client_ip":"1.1.1.1"}}
  expect:
   - 'frontend.navtiming2.domComplete.mobile.overall:1204|ms'
   - 'frontend.navtiming2.domComplete.overall:1204|ms'
@@ -790,6 +790,20 @@ Largest contentful paint, Cumulative layout shift and network info:
   - 'frontend.navtiming2.gaps.by_country.United_States:3|ms'
   - 'frontend.navtiming2.domComplete.mobile.anonymous:1204|ms'
   - 'frontend.navtiming_group.group2:1|c'
+  - 'frontend.navtiming2.longTaskTotalDuration.mobile.anonymous:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.mobile.overall:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.overall:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.by_browser.Chrome_Mobile.108:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.by_browser.Chrome_Mobile.all:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.by_continent.North_America:189|ms'
+  - 'frontend.navtiming2.longTaskTotalDuration.by_country.United_States:189|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.mobile.anonymous:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.mobile.overall:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.overall:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.by_browser.Chrome_Mobile.108:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.by_browser.Chrome_Mobile.all:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.by_continent.North_America:5|ms'
+  - 'frontend.navtiming2.longTaskTotalTasks.by_country.United_States:5|ms' 
  metrics:
   - ['painttiming_largestcontentfulpaint_seconds_count', {'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
   - ['cumulativelayoutshift_score_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
@@ -802,6 +816,8 @@ Largest contentful paint, Cumulative layout shift and network info:
   - ['navigationtimingdelta_redirect_seconds_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False', 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
   - ['navigationtimingdelta_tcp_seconds_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False', 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
   - ['network_information_total', {'network_type': 'wifi', 'network_effectivetype': '4g', 'geo_country':'United States', 'platform': 'mobile', 'is_oversample': 'False'}, 1]
+  - ['longtask_totalduration_seconds_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
+  - ['longtask_totaltasks_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
 
 # Hacked events to simulate metrics out of order and metric that are below zero
 Non sane events:
