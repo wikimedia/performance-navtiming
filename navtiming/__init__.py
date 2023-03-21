@@ -300,6 +300,12 @@ class NavTiming(object):
                       ['cache_host', 'cache_response_type'],
                       buckets=self.navtiming_low_buckets,
                       namespace=namespace)
+        self.prometheus_counters['painttiming_firstpaint_seconds'] = \
+            Histogram('painttiming_firstpaint_seconds',
+                      'First paint from the first paint API',
+                      navigation_timing_labels,
+                      buckets=self.navtiming_high_buckets,
+                      namespace=namespace)
         self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'] = \
             Histogram('painttiming_firstcontentfulpaint_seconds',
                       'first-contentful-paint from the Paint Timing API',
@@ -873,6 +879,10 @@ class NavTiming(object):
         # navigation timing data
         if 'cumulativeLayoutShift' in event:
             metrics_nav2['cumulativeLayoutShift'] = event['cumulativeLayoutShift']
+        if 'firstPaint' in event:
+            metrics_nav2['firstPaint'] = event['firstPaint']
+        if 'firstContentfulPaint' in event:
+            metrics_nav2['firstContentfulPaint'] = event['firstContentfulPaint']
         if 'largestContentfulPaint' in event:
             metrics_nav2['largestContentfulPaint'] = event['largestContentfulPaint']
         if 'longTaskTotalDuration' in event:
@@ -937,6 +947,14 @@ class NavTiming(object):
                     ).observe(value)
                 elif metric == 'largestContentfulPaint':
                     self.prometheus_counters['painttiming_largestcontentfulpaint_seconds'].labels(
+                        mw_context, country_name, continent, browser_family, is_oversample, group, skin
+                    ).observe(value / 1000.0)
+                elif metric == 'firstPaint':
+                    self.prometheus_counters['painttiming_firstpaint_seconds'].labels(
+                        mw_context, country_name, continent, browser_family, is_oversample, group, skin
+                    ).observe(value / 1000.0)
+                elif metric == 'firstContentfulPaint':
+                    self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'].labels(
                         mw_context, country_name, continent, browser_family, is_oversample, group, skin
                     ).observe(value / 1000.0)
                 elif metric == 'longTaskTotalDuration':
