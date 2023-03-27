@@ -211,9 +211,13 @@ class NavTiming(object):
         }
 
         # Two level of buckets, one for the small/early ones and one for late ones
-        self.navtiming_low_buckets = [.01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5]
-        self.navtiming_high_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 3, 5, 10]
-
+        # These also match Google thresholds for web vitals, so if we change these
+        # we should make sure they match
+        # https://support.google.com/webmasters/answer/9205520?hl=en
+        # https://web.dev/ttfb/
+        # https://web.dev/fcp/
+        self.navtiming_low_buckets = [.01, .025, .05, .075, .1, .25, .5, 1.0, 1.8, 2.5]
+        self.navtiming_high_buckets = [0.1, 0.3, 0.5, 0.7, 0.8, 1, 2, 2.5, 4, 10]
         self.prometheus_bucket_mapping = {
             'usertiming_mediawikiloadend_seconds': self.navtiming_high_buckets,
             'navigationtiming_dominteractive_seconds': self.navtiming_high_buckets,
