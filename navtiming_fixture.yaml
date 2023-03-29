@@ -117,12 +117,12 @@ Uncached page view from desktop with isOversample=false:
  metrics:
    - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'foo', 'cache_response_type': 'hit-front'}, 1]
    - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'foo', 'cache_response_type': 'hit-front'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.01'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.025'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.05'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.075'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.2'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.3'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'foo', 'cache_response_type': 'hit-front', 'le': '0.5'}, 1]
 
 Uncached page view from desktop with isOversample=false and empty Server Timing data:
@@ -133,12 +133,12 @@ Uncached page view from desktop with isOversample=false and empty Server Timing 
  metrics:
    - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 1]
    - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.01'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.025'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.05'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.075'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.2'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.3'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.5'}, 1]
 
 Uncached page view from desktop with isOversample=false and missing Server Timing data 2:
@@ -149,12 +149,12 @@ Uncached page view from desktop with isOversample=false and missing Server Timin
  metrics:
    - ['navtiming_responsestart_by_cache_host_seconds_count', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 1]
    - ['navtiming_responsestart_by_cache_host_seconds_sum', {'cache_host': 'unknown', 'cache_response_type': 'unknown'}, 0.379]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.01'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.025'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.05'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.075'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.1'}, 0]
-   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.25'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.2'}, 0]
+   - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.3'}, 0]
    - ['navtiming_responsestart_by_cache_host_seconds_bucket', {'cache_host': 'unknown', 'cache_response_type': 'unknown', 'le': '0.5'}, 1]
 
 # Sample from April 2018
