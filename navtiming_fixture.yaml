@@ -594,21 +594,6 @@ SaveTiming:
   - mw.performance.save_by_group.other:2729|ms
   - mw.performance.save_by_group.other:949|ms
 
-# Sample from April 2019
-# https://meta.wikimedia.org/w/index.php?title=Schema:PaintTiming&oldid=19000009
-PaintTiming:
- input:
-  - {"event": {"pageviewToken":"example", "name":"first-paint", "startTime":805, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema":"PaintTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
- expect:
-  - frontend.navtiming2_oversample.firstPaint.desktop.authenticated:805|ms
-  - frontend.navtiming2_oversample.firstPaint.desktop.overall:805|ms
-  - frontend.navtiming2_oversample.firstPaint.overall:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_browser.Firefox.55:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_browser.Firefox.all:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_continent.Europe:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_country.France:805|ms
-  - frontend.painttiming_group.group1:1|c
-
 QuickSurveyInitiation:
  input:
   - {"event": {"beaconCapable":"true", "surveySessionToken":"1234af", "pageviewToken":"foobar", "surveyCodeName":"perceived-performance-survey", "eventName":"eligible", "performanceNow":3 }, "revision":19000009, "schema":"QuickSurveyInitiation", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
@@ -620,19 +605,6 @@ QuickSurveyInitiation:
    - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'eligible'}, 1]
    - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'impression'}, 1]
 
-EventGate:
- input:
-  - {"event": {"pageviewToken":"example", "name":"first-paint", "startTime":805, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "schema": "PaintTiming", "webHost": "ca.wikipedia.org", "wiki": "cawiki", "$schema": "/analytics/legacy/painttiming/1.1.0", "meta": {"dt": "2020-04-02T19:11:20.942Z", "stream": "eventlogging_PaintTiming", "id": "b0caf18d-6c7f-4403-947d-2712bbe28610", "request_id": "bd54dd80-7515-11ea-98e5-fd72443e8b45"}, "dt": "2020-04-02T19:11:20.942Z", "http": {"request_headers": {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"}}}
- expect:
-  - frontend.navtiming2_oversample.firstPaint.desktop.authenticated:805|ms
-  - frontend.navtiming2_oversample.firstPaint.desktop.overall:805|ms
-  - frontend.navtiming2_oversample.firstPaint.overall:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_browser.Chrome.80:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_browser.Chrome.all:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_continent.Europe:805|ms
-  - frontend.navtiming2_oversample.firstPaint.by_country.France:805|ms
-  - frontend.painttiming_group.group1:1|c
-
 CpuBenchmark:
  input:
   - {"event": {"pageviewToken":"example", "score":126, "batteryLevel":0.81, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
@@ -641,22 +613,6 @@ CpuBenchmark:
   - {"event": {"pageviewToken":"example", "score":150, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  metrics:
   - ['cpubenchmark_seconds_count', {'origin_country': 'France', 'platform': 'desktop','is_oversample': 'True'}, 4]
-
-# Sample from 13/12-2022
-First contentful paint:
-  input:
-    - {"event":{"pageviewToken":"example","isAnon":true,"isOversample":false,"originCountry":"JP","name":"first-contentful-paint","startTime":681,"skin":"vector","namespaceId":1,"action":"view"},"schema":"PaintTiming","webHost":"example","wiki":"enwiki","$schema":"/analytics/legacy/painttiming/1.2.0","client_dt":"2022-12-13T06:27:12.100Z","meta":{"stream":"eventlogging_PaintTiming","domain":"en.wikipedia.org","id":"82e86b06-9dc0-4fbe-95c4-292d901ca229","dt":"2022-12-13T06:27:42.452Z","request_id":"a5ea53e1-a470-4b53-9783-d129afe207a9"},"dt":"2022-12-13T06:27:42.452Z","http":{"request_headers":{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"}}}
-  expect:
-    - 'frontend.navtiming2.firstContentfulPaint.desktop.anonymous:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.desktop.overall:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.overall:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.by_browser.Chrome.108:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.by_browser.Chrome.all:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.by_continent.Asia:681|ms'
-    - 'frontend.navtiming2.firstContentfulPaint.by_country.Japan:681|ms'
-    - 'frontend.painttiming_group.group2:1|c'
-  metrics:
-    - ['painttiming_firstcontentfulpaint_seconds_count', {'mw_context': 'anonymous_talk_view', 'geo_country': 'Japan', 'geo_continent': 'Asia', 'ua_family': 'Chrome', 'is_oversample': 'False', 'mw_group': 'group2', 'mw_skin': 'vector'}, 1]
 
 # Sample from 13/12-2022 (modified to add longtask)
 Largest contentful paint, Cumulative layout shift, network info and longtask:

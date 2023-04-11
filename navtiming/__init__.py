@@ -73,7 +73,6 @@ class NavTiming(object):
             'SaveTiming': self.handle_save_timing,
             'QuickSurveysResponses': self.handle_quick_surveys_responses,
             'QuickSurveyInitiation': self.handle_quick_survey_initiation,
-            'PaintTiming': self.handle_paint_timing,
             'CpuBenchmark': self.handle_cpu_benchmark
         }
 
@@ -653,54 +652,6 @@ class NavTiming(object):
         self.prometheus_counters['performance_survey_initiations'].labels(wiki, eventName).inc()
 
         yield self.make_count('performance.survey_initiation', wiki, eventName)
-
-    def handle_paint_timing(self, meta):
-        event = meta['event']
-        wiki = meta['wiki']
-        group = self.wiki_to_group(wiki)
-
-        try:
-            platform, auth, ua, continent, country_name, is_oversample, mw_context, skin = \
-                self.get_navigation_timing_context(meta)
-        except Exception:
-            return
-
-        ua_family, ua_version = ua
-        # Map for Prometheus
-        browser_family = self.browser_family_mapping.get(ua_family, 'Other')
-
-        value = event['startTime']
-
-        if event['name'] == 'first-paint':
-            metric = 'firstPaint'
-        elif event['name'] == 'first-contentful-paint':
-            metric = 'firstContentfulPaint'
-            self.prometheus_counters['painttiming_firstcontentfulpaint_seconds'].labels(
-                mw_context, country_name, continent, browser_family, is_oversample, group, skin
-            ).observe(value / 1000.0)
-        else:
-            self.prometheus_counters['painttiming_invalid_events'].inc()
-            yield self.make_count('eventlogging.client_errors.PaintTiming', 'isValidName')
-            return
-
-        if not self.is_sane_navtiming2(value):
-            self.prometheus_counters['painttiming_invalid_events'].inc()
-            yield self.make_count('eventlogging.client_errors.PaintTiming', 'isSane')
-            return
-
-        # PaintTiming is funneled to navtiming2 for backwards compatibility
-        for stat in self.make_navigation_timing_stats(
-                platform,
-                auth,
-                ua,
-                continent,
-                country_name,
-                is_oversample,
-                metric,
-                value):
-            yield stat
-
-        yield self.make_count('frontend.painttiming_group', group)
 
     def handle_cpu_benchmark(self, meta):
         event = meta['event']
