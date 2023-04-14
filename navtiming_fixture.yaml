@@ -614,6 +614,15 @@ CpuBenchmark:
  metrics:
   - ['cpubenchmark_seconds_count', {'origin_country': 'France', 'platform': 'desktop','is_oversample': 'True'}, 4]
 
+FirstInputDelay:
+ input:
+  - {"event": {"pageviewToken":"example", "inputDelay":126, "batteryLevel":0.81, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+  - {"event": {"pageviewToken":"example", "inputDelay":99, "batteryLevel":0.49, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+  - {"event": {"pageviewToken":"example", "inputDelay":40, "batteryLevel":0.05, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+  - {"event": {"pageviewToken":"example", "inputDelay":150, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
+ metrics:
+  - ['firstinputdelay_seconds_count', {'origin_country': 'France', 'continent': 'Europe', 'skin': 'unknown','is_oversample': 'True'}, 4]
+
 # Sample from 13/12-2022 (modified to add longtask)
 Largest contentful paint, Cumulative layout shift, network info and longtask:
  input:

@@ -73,7 +73,8 @@ class NavTiming(object):
             'SaveTiming': self.handle_save_timing,
             'QuickSurveysResponses': self.handle_quick_surveys_responses,
             'QuickSurveyInitiation': self.handle_quick_survey_initiation,
-            'CpuBenchmark': self.handle_cpu_benchmark
+            'CpuBenchmark': self.handle_cpu_benchmark,
+            'FirstInputDelay': self.handle_first_input_delay
         }
 
         # Mapping of continent names to ISO 3166 country codes.
@@ -349,6 +350,12 @@ class NavTiming(object):
                       navigation_timing_labels,
                       buckets=[1, 3, 6, 10, 15, 20],
                       namespace=namespace)
+        self.prometheus_counters['firstinputdelay_seconds'] = \
+            Histogram('firstinputdelay_seconds', 'Fist Input Delay data from FirstInputDelay schema',
+                      ['origin_country', 'continent', 'skin', 'is_oversample'],
+                      buckets=self.navtiming_low_buckets,
+                      namespace=namespace)
+
         # Navigation timing, deltas and user timings
         for name, prometheus_name in self.prometheus_metrics_mapping.items():
             self.prometheus_counters[prometheus_name] = \
@@ -674,6 +681,30 @@ class NavTiming(object):
         # as a generator function.  We don't actually yield any Graphite
         # metrics for this schema, so the yield is unreachable.
         return
+        yield
+
+    def handle_first_input_delay(self, meta):
+        event = meta['event']
+
+        try:
+            platform, auth, ua, continent, country_name, is_oversample, mw_context, skin = \
+                self.get_navigation_timing_context(meta)
+        except Exception:
+            return
+
+        value = event['inputDelay']
+
+        self.prometheus_counters['firstinputdelay_seconds'].labels(
+            country_name,
+            continent,
+            skin,
+            str(is_oversample),
+        ).observe(value / 1000.0)
+
+        return
+
+        # We don't actually yield any Graphite, but the statement is
+        # needed so the function is treated as generator function
         yield
 
     def get_navigation_timing_context(self, meta):
