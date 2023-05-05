@@ -240,6 +240,9 @@ class NavTiming(object):
         # https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type
         self.network_types = ['wifi', 'ethernet', 'cellular']
 
+        # Elements that can be largest paint. If it's not matched, it will be "other"
+        self.largest_contentful_paint_elements = ['P', 'IMG', 'TD', 'A', 'UL', 'H1']
+
         self.initialize_prometheus_counters(prometheus_namespace)
 
     def initialize_prometheus_counters(self, namespace):
@@ -269,6 +272,10 @@ class NavTiming(object):
         self.prometheus_counters['network_information'] = \
             Counter('network_information', 'Network information from the Network API',
                     network_labels, namespace=namespace)
+
+        self.prometheus_counters['painttiming_largestcontentfulpaintelement'] = \
+            Counter('painttiming_largestcontentfulpaintelement', 'Element as largest contentful paint element',
+                    ['element', 'mw_skin', 'is_oversample'], namespace=namespace)
 
         # Validation
         self.prometheus_counters['painttiming_invalid_events'] = \
@@ -961,6 +968,12 @@ class NavTiming(object):
                             mw_context, country_name, continent, browser_family, is_oversample, group, skin
                         ).observe(value / 1000.0)
 
+            if 'largestContentfulPaintElement' in event:
+                element = 'other' if event['largestContentfulPaintElement'] not in \
+                    self.largest_contentful_paint_elements else event['largestContentfulPaintElement']
+                self.prometheus_counters['painttiming_largestcontentfulpaintelement'].labels(
+                    element.lower(), skin, is_oversample
+                ).inc()
             # We have network information from a browser that supports the API
             if 'netinfoEffectiveConnectionType' in event and \
                     'netinfoConnectionType' in event:

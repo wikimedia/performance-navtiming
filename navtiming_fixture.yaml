@@ -800,6 +800,7 @@ Largest contentful paint, Cumulative layout shift, network info and longtask:
   - ['network_information_total', {'network_type': 'wifi', 'network_effectivetype': '4g', 'geo_country':'United States', 'platform': 'mobile', 'is_oversample': 'False'}, 1]
   - ['longtask_totalduration_seconds_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
   - ['longtask_totaltasks_count',{'mw_context': 'anonymous_mainspace_view', 'geo_country': 'United States', 'geo_continent': 'North America', 'ua_family': 'Chrome', 'is_oversample': 'False' , 'mw_group': 'group2', 'mw_skin': 'minerva'}, 1]
+  - ['painttiming_largestcontentfulpaintelement_total',{'element': 'p', 'mw_skin': 'minerva', 'is_oversample': 'False' }, 1]
 
 # Hacked events to simulate metrics out of order and metric that are below zero
 Non sane events:
