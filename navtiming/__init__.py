@@ -359,7 +359,7 @@ class NavTiming(object):
                       namespace=namespace)
         self.prometheus_counters['firstinputdelay_seconds'] = \
             Histogram('firstinputdelay_seconds', 'First Input Delay data from FirstInputDelay schema',
-                      ['origin_country', 'continent', 'skin', 'is_oversample'],
+                      ['geo_country', 'geo_continent', 'mw_skin', 'is_oversample'],
                       buckets=self.navtiming_low_buckets,
                       namespace=namespace)
 
