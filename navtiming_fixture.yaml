@@ -594,17 +594,6 @@ SaveTiming:
   - mw.performance.save_by_group.other:2729|ms
   - mw.performance.save_by_group.other:949|ms
 
-QuickSurveyInitiation:
- input:
-  - {"event": {"beaconCapable":"true", "surveySessionToken":"1234af", "pageviewToken":"foobar", "surveyCodeName":"perceived-performance-survey", "eventName":"eligible", "performanceNow":3 }, "revision":19000009, "schema":"QuickSurveyInitiation", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
-  - {"event": {"beaconCapable":"true", "surveySessionToken":"1234af", "pageviewToken":"foobar", "surveyCodeName":"perceived-performance-survey", "eventName":"impression", "performanceNow":3 }, "revision":19000009, "schema":"QuickSurveyInitiation", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
- expect:
-  - performance.survey_initiation.cawiki.eligible:1|c
-  - performance.survey_initiation.cawiki.impression:1|c
- metrics:
-   - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'eligible'}, 1]
-   - ['performance_survey_initiations_total', {'wiki': 'cawiki', 'event': 'impression'}, 1]
-
 CpuBenchmark:
  input:
   - {"event": {"pageviewToken":"example", "score":126, "batteryLevel":0.81, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}

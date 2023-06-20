@@ -71,8 +71,6 @@ class NavTiming(object):
         self.handlers = {
             'NavigationTiming': self.handle_navigation_timing,
             'SaveTiming': self.handle_save_timing,
-            'QuickSurveysResponses': self.handle_quick_surveys_responses,
-            'QuickSurveyInitiation': self.handle_quick_survey_initiation,
             'CpuBenchmark': self.handle_cpu_benchmark,
             'FirstInputDelay': self.handle_first_input_delay
         }
@@ -258,14 +256,6 @@ class NavTiming(object):
                   ['schema'], namespace=namespace)
         self.prometheus_counters['errors'] = \
             Counter('errors', 'Unhandled exceptions while processing', namespace=namespace)
-
-        # Performance Survey
-        self.prometheus_counters['performance_survey_responses'] = \
-            Counter('performance_survey_responses', 'Performance survey responses',
-                    ['wiki', 'response'], namespace=namespace)
-        self.prometheus_counters['performance_survey_initiations'] = \
-            Counter('performance_survey_initiations', 'Performance survey initiations',
-                    ['wiki', 'event'], namespace=namespace)
 
         # Network info
         network_labels = ['network_type', 'network_effectivetype', 'geo_country', 'platform', 'is_oversample']
@@ -637,35 +627,6 @@ class NavTiming(object):
             yield self.make_stat('mw.performance.save_by_group', group, value=duration)
         else:
             self.prometheus_counters['savetiming_invalid_events'].inc()
-
-    def handle_quick_surveys_responses(self, meta):
-        event = meta['event']
-        wiki = meta['wiki']
-        surveyCodeName = event.get('surveyCodeName')
-        surveyResponseValue = event.get('surveyResponseValue')
-
-        if surveyCodeName != 'perceived-performance-survey' or not wiki or not surveyResponseValue:
-            return
-
-        # Example: ext-quicksurveys-example-internal-survey-answer-neutral
-        response = surveyResponseValue[48:]
-
-        self.prometheus_counters['performance_survey_responses'].labels(wiki, response).inc()
-
-        yield self.make_count('performance.survey', wiki, response)
-
-    def handle_quick_survey_initiation(self, meta):
-        event = meta['event']
-        wiki = meta['wiki']
-        surveyCodeName = event.get('surveyCodeName')
-        eventName = event.get('eventName')
-
-        if surveyCodeName != 'perceived-performance-survey' or not wiki or not eventName:
-            return
-
-        self.prometheus_counters['performance_survey_initiations'].labels(wiki, eventName).inc()
-
-        yield self.make_count('performance.survey_initiation', wiki, eventName)
 
     def handle_cpu_benchmark(self, meta):
         event = meta['event']
