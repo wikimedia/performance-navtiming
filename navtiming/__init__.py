@@ -155,7 +155,6 @@ class NavTiming(object):
             # less Western-centrism, countries from
             # https://stats.wikimedia.org/#/all-projects/reading/page-views-by-country
             'BR': 'Brazil',          # 9. BR 2.4%
-            'CA': 'Canada',          # 10. CA 2.4%
             'DE': 'Germany',         # 4. DE 5.6%
             'EG': 'Egypt',
             'FR': 'France',          # 6. FR 3.9%
@@ -166,6 +165,7 @@ class NavTiming(object):
             'JP': 'Japan',           # 2. JP 8.9%
             'RU': 'Russia',          # 8. RU 2.9%
             'US': 'United States',   # 1. US 20.7%
+            'VN': 'Vietnam',
             'ZA': 'South Africa',
         }
         # The list of wikis in the groups is non-exhaustive
