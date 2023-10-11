@@ -20,7 +20,7 @@ class NavTiming(object):
                  kafka_brokers=None, kafka_security_protocol='PLAINTEXT',
                  kafka_ssl_cafile=None, kafka_consumer_group='navtiming',
                  kafka_fixture=None,
-                 statsd_host='localhost', statsd_port=8125,
+                 statsd_host='localhost', statsd_port=8125, statsd_refresh=10,
                  datacenter=None,
                  etcd_domain=None, etcd_path=None, etcd_refresh=10,
                  prometheus_namespace='webperf',
@@ -39,6 +39,8 @@ class NavTiming(object):
         self.kafka_fixture = kafka_fixture
         self.statsd_host = statsd_host
         self.statsd_port = statsd_port
+        self.statsd_refresh = statsd_refresh
+        self.statsd_next_update = time.time() + self.statsd_refresh
         self.verbose = verbose
         self.dry_run = dry_run
 
@@ -1051,6 +1053,10 @@ class NavTiming(object):
                 self.log.info('Canary event')
                 continue
 
+            if self.statsd_next_update <= time.time():
+                self.statsd_addr = socket.gethostbyname(self.statsd_host), self.statsd_port
+                self.statsd_next_update = time.time() + self.statsd_refresh
+
             if 'schema' in meta:
                 f = self.handlers.get(meta['schema'])
                 if f is not None:
@@ -1092,6 +1098,10 @@ def main(cluster=None, config=None):
     ap.add_argument('--statsd-port',
                     default=int(parsed_configs.get('statsd_port', 8125)),
                     type=int)
+    ap.add_argument('--statsd-refresh',
+                    required=False,
+                    default=float(parsed_configs.get('statsd_refresh', 10)),
+                    help='Seconds to wait before refreshing statsd')
     ap.add_argument('--listen',
                     default=parsed_configs.get('listen', ':9230'),
                     type=str,
@@ -1138,6 +1148,7 @@ def main(cluster=None, config=None):
                    kafka_fixture=args.kafka_fixture,
                    statsd_host=args.statsd_host,
                    statsd_port=args.statsd_port,
+                   statsd_refresh=args.statsd_refresh,
                    datacenter=args.datacenter,
                    etcd_domain=args.etcd_domain,
                    etcd_path=args.etcd_path,
