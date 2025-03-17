@@ -35,4 +35,4 @@ This repository is maintained on [Gerrit](https://gerrit.wikimedia.org/g/perform
 
 Submit bug reports or feature requests to [Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?project=mediawiki-extensions-navigationtiming,performance-team).
 
-This project is maintained by the [Performance Team](https://www.mediawiki.org/wiki/Performance_Team).
+This project is looking for a team to maintain it.
