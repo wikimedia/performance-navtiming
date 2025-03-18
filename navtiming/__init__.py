@@ -549,10 +549,7 @@ class NavTiming(object):
         return (browser_family, version)
 
     def dispatch_stat(self, stat):
-        if self.statsd_sock and self.statsd_addr and not self.dry_run:
-            self.statsd_sock.sendto(stat, self.statsd_addr)
-        else:
-            self.log.debug(stat)
+        self.log.debug('Graphite disabled T389047: not sending metric: {}'.format(stat))
 
     def make_stat(self, *args, value):
         """
