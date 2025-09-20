@@ -746,14 +746,15 @@ class NavTiming(object):
         #
         # Handle namespaces https://www.mediawiki.org/wiki/Manual:Namespace
         # - All uneven namespaces over 0 are talk pages
-        if (auth == 'anonymous' and
-                'action' in event and
+        if ('action' in event and
                 event['action'] == 'view' and
                 'namespaceId' in event):
             if event['namespaceId'] == 0:
-                mw_context = 'anonymous_mainspace_view'
+                # Values: anonymous_mainspace_view, authenticated_mainspace_view
+                mw_context = f'{auth}_mainspace_view'
             elif event['namespaceId'] % 2 > 0 and event['namespaceId'] > 0:
-                mw_context = 'anonymous_talk_view'
+                # Values: anonymous_talk_view, authenticated_talk_view
+                mw_context = f'{auth}_talk_view'
             else:
                 mw_context = 'other'
         else:
