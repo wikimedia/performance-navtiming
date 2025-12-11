@@ -150,25 +150,30 @@ class NavTiming(object):
         # - <https://wikitech.wikimedia.org/wiki/EventLogging#Accessing_data>
         # - <https://wikitech.wikimedia.org/wiki/Analytics/Data_access#Access_Groups>
         self.iso_3166_whitelist = {
-            # Annotated based on results from this Hive query:
-            # > SELECT COUNT(*), event.originCountry FROM navigationtiming WHERE year=2019
-            #   AND month=8 AND day=4 AND event.isOversample=0 GROUP BY event.originCountry;
-            # List updated late 2022 to include three more countries to make the list a little
-            # less Western-centrism, countries from
+            # Last update: December 2025
             # https://stats.wikimedia.org/#/all-projects/reading/page-views-by-country
-            'BR': 'Brazil',          # 9. BR 2.4%
-            'DE': 'Germany',         # 4. DE 5.6%
-            'EG': 'Egypt',
-            'FR': 'France',          # 6. FR 3.9%
-            'GB': 'United Kingdom',  # 3. GB 4.7%
-            'IN': 'India',           # 5. IN 5.4%
-            'IR': 'Iran',
-            'IT': 'Italy',           # 7. IT 3.7%
-            'JP': 'Japan',           # 2. JP 8.9%
-            'RU': 'Russia',          # 8. RU 2.9%
-            'US': 'United States',   # 1. US 20.7%
-            'VN': 'Vietnam',
-            'ZA': 'South Africa',
+            # With the objective to:
+            # * No more than 10 in total; to avoid Prometheus cardinality explosion.
+            # * Don't mulitple countries with a similar audience in terms
+            #   of device cost (cpu bench, socioeconomic), latency (distance to POP)
+            #   and geopolitical location; to make the most of those 10 choices
+            # * Bias toward keeping entries that we use regularly in analysis;
+            #   to allow for long-term analysis and continuity, even if not for
+            #   the "ideal" countries of any given one moment in time.
+            'BR': 'Brazil',          # 10. BR, 333M [keep long-term]
+            'DE': 'Germany',         # 5.  DE, 782M
+            #                          6.  FR, 542M [exclude]
+            'GB': 'United Kingdom',  # 3.  GB, 810M
+            'IN': 'India',           # 4.  IN, 783M
+            'IR': 'Iran',            # -            [keep long-term]
+            'IT': 'Italy',           # 7.  IT, 429M
+            'JP': 'Japan',           # 2.  JP, 1B
+            'RU': 'Russia',          # -            [keep long-term]
+            'US': 'United States',   # 1.  US, 3B
+            'VN': 'Vietnam',         # [keep long-term, T340714]
+            'ZA': 'South Africa',    # -            [keep long-term]
+            #                          8. CA, 403M  [exclude, T340714]
+            #                          9. HK, 333M  [exclude]
         }
         # The list of wikis in the groups is non-exhaustive
         self.group_mapping = {

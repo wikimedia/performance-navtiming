@@ -349,7 +349,7 @@ Mobile page view:
 # Sample from September 2017 (added gaps)
 # https://meta.wikimedia.org/w/index.php?title=Schema:NavigationTiming&oldid=17216284
 View with timings above threshold (for navtiming):
- input: {"event": {"action": "view", "connectEnd": 0, "connectStart": 0, "dnsLookup": 0, "domComplete": 203077, "domInteractive": 7403, "fetchStart": 0, "firstPaint": 9356, "isAnon": true, "isHiDPI": false, "isHttp2": true, "loadEventEnd": 204085, "loadEventStart": 204083, "mediaWikiLoadComplete": 20922, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "FR", "originRegion": "X", "pageId": 1, "requestStart": 4484, "responseEnd": 6286, "responseStart": 5027, "revId": 1, "gaps": 12}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 10\", \"browser_minor\": \"15063\", \"wmf_app_version\": \"-\", \"browser_major\": \"15\", \"browser_family\": \"Edge\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
+ input: {"event": {"action": "view", "connectEnd": 0, "connectStart": 0, "dnsLookup": 0, "domComplete": 203077, "domInteractive": 7403, "fetchStart": 0, "firstPaint": 9356, "isAnon": true, "isHiDPI": false, "isHttp2": true, "loadEventEnd": 204085, "loadEventStart": 204083, "mediaWikiLoadComplete": 20922, "mediaWikiVersion": "1.30.0-wmf.19", "namespaceId": 1, "originCountry": "DE", "originRegion": "X", "pageId": 1, "requestStart": 4484, "responseEnd": 6286, "responseStart": 5027, "revId": 1, "gaps": 12}, "recvFrom": "example", "revision": 1, "schema": "NavigationTiming", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 10\", \"browser_minor\": \"15063\", \"wmf_app_version\": \"-\", \"browser_major\": \"15\", \"browser_family\": \"Edge\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "example", "wiki": "example"}
  expect:
   # domComplete, loadEventStart and loadEventEnd are above threshold (FIXME)
   - frontend.navtiming2.onLoad.desktop.anonymous:2|ms
@@ -358,91 +358,91 @@ View with timings above threshold (for navtiming):
   - frontend.navtiming2.onLoad.by_browser.Edge.15:2|ms
   - frontend.navtiming2.onLoad.by_browser.Edge.all:2|ms
   - frontend.navtiming2.onLoad.by_continent.Europe:2|ms
-  - frontend.navtiming2.onLoad.by_country.France:2|ms
+  - frontend.navtiming2.onLoad.by_country.Germany:2|ms
   - frontend.navtiming2.dns.desktop.anonymous:0|ms
   - frontend.navtiming2.dns.desktop.overall:0|ms
   - frontend.navtiming2.dns.overall:0|ms
   - frontend.navtiming2.dns.by_browser.Edge.15:0|ms
   - frontend.navtiming2.dns.by_browser.Edge.all:0|ms
   - frontend.navtiming2.dns.by_continent.Europe:0|ms
-  - frontend.navtiming2.dns.by_country.France:0|ms
+  - frontend.navtiming2.dns.by_country.Germany:0|ms
   - frontend.navtiming2.request.desktop.anonymous:543|ms
   - frontend.navtiming2.request.desktop.overall:543|ms
   - frontend.navtiming2.request.overall:543|ms
   - frontend.navtiming2.request.by_browser.Edge.15:543|ms
   - frontend.navtiming2.request.by_browser.Edge.all:543|ms
   - frontend.navtiming2.request.by_continent.Europe:543|ms
-  - frontend.navtiming2.request.by_country.France:543|ms
+  - frontend.navtiming2.request.by_country.Germany:543|ms
   - frontend.navtiming2.processing.desktop.anonymous:196791|ms
   - frontend.navtiming2.processing.desktop.overall:196791|ms
   - frontend.navtiming2.processing.overall:196791|ms
   - frontend.navtiming2.processing.by_browser.Edge.15:196791|ms
   - frontend.navtiming2.processing.by_browser.Edge.all:196791|ms
   - frontend.navtiming2.processing.by_continent.Europe:196791|ms
-  - frontend.navtiming2.processing.by_country.France:196791|ms
+  - frontend.navtiming2.processing.by_country.Germany:196791|ms
   - frontend.navtiming2.firstPaint.desktop.anonymous:9356|ms
   - frontend.navtiming2.firstPaint.desktop.overall:9356|ms
   - frontend.navtiming2.firstPaint.overall:9356|ms
   - frontend.navtiming2.firstPaint.by_browser.Edge.15:9356|ms
   - frontend.navtiming2.firstPaint.by_browser.Edge.all:9356|ms
   - frontend.navtiming2.firstPaint.by_continent.Europe:9356|ms
-  - frontend.navtiming2.firstPaint.by_country.France:9356|ms
+  - frontend.navtiming2.firstPaint.by_country.Germany:9356|ms
   - frontend.navtiming2.tcp.desktop.anonymous:0|ms
   - frontend.navtiming2.tcp.desktop.overall:0|ms
   - frontend.navtiming2.tcp.overall:0|ms
   - frontend.navtiming2.tcp.by_browser.Edge.15:0|ms
   - frontend.navtiming2.tcp.by_browser.Edge.all:0|ms
   - frontend.navtiming2.tcp.by_continent.Europe:0|ms
-  - frontend.navtiming2.tcp.by_country.France:0|ms
+  - frontend.navtiming2.tcp.by_country.Germany:0|ms
   - frontend.navtiming2.loadEventEnd.desktop.anonymous:204085|ms
   - frontend.navtiming2.loadEventEnd.desktop.overall:204085|ms
   - frontend.navtiming2.loadEventEnd.overall:204085|ms
   - frontend.navtiming2.loadEventEnd.by_browser.Edge.15:204085|ms
   - frontend.navtiming2.loadEventEnd.by_browser.Edge.all:204085|ms
   - frontend.navtiming2.loadEventEnd.by_continent.Europe:204085|ms
-  - frontend.navtiming2.loadEventEnd.by_country.France:204085|ms
+  - frontend.navtiming2.loadEventEnd.by_country.Germany:204085|ms
   - frontend.navtiming2.loadEventStart.desktop.anonymous:204083|ms
   - frontend.navtiming2.loadEventStart.desktop.overall:204083|ms
   - frontend.navtiming2.loadEventStart.overall:204083|ms
   - frontend.navtiming2.loadEventStart.by_browser.Edge.15:204083|ms
   - frontend.navtiming2.loadEventStart.by_browser.Edge.all:204083|ms
   - frontend.navtiming2.loadEventStart.by_continent.Europe:204083|ms
-  - frontend.navtiming2.loadEventStart.by_country.France:204083|ms
+  - frontend.navtiming2.loadEventStart.by_country.Germany:204083|ms
   - frontend.navtiming2.response.desktop.anonymous:1259|ms
   - frontend.navtiming2.response.desktop.overall:1259|ms
   - frontend.navtiming2.response.overall:1259|ms
   - frontend.navtiming2.response.by_browser.Edge.15:1259|ms
   - frontend.navtiming2.response.by_browser.Edge.all:1259|ms
   - frontend.navtiming2.response.by_continent.Europe:1259|ms
-  - frontend.navtiming2.response.by_country.France:1259|ms
+  - frontend.navtiming2.response.by_country.Germany:1259|ms
   - frontend.navtiming2.domComplete.desktop.anonymous:203077|ms
   - frontend.navtiming2.domComplete.desktop.overall:203077|ms
   - frontend.navtiming2.domComplete.overall:203077|ms
   - frontend.navtiming2.domComplete.by_browser.Edge.15:203077|ms
   - frontend.navtiming2.domComplete.by_browser.Edge.all:203077|ms
   - frontend.navtiming2.domComplete.by_continent.Europe:203077|ms
-  - frontend.navtiming2.domComplete.by_country.France:203077|ms
+  - frontend.navtiming2.domComplete.by_country.Germany:203077|ms
   - frontend.navtiming2.responseStart.desktop.anonymous:5027|ms
   - frontend.navtiming2.responseStart.desktop.overall:5027|ms
   - frontend.navtiming2.responseStart.overall:5027|ms
   - frontend.navtiming2.responseStart.by_browser.Edge.15:5027|ms
   - frontend.navtiming2.responseStart.by_browser.Edge.all:5027|ms
   - frontend.navtiming2.responseStart.by_continent.Europe:5027|ms
-  - frontend.navtiming2.responseStart.by_country.France:5027|ms
+  - frontend.navtiming2.responseStart.by_country.Germany:5027|ms
   - frontend.navtiming2.domInteractive.desktop.anonymous:7403|ms
   - frontend.navtiming2.domInteractive.desktop.overall:7403|ms
   - frontend.navtiming2.domInteractive.overall:7403|ms
   - frontend.navtiming2.domInteractive.by_browser.Edge.15:7403|ms
   - frontend.navtiming2.domInteractive.by_browser.Edge.all:7403|ms
   - frontend.navtiming2.domInteractive.by_continent.Europe:7403|ms
-  - frontend.navtiming2.domInteractive.by_country.France:7403|ms
+  - frontend.navtiming2.domInteractive.by_country.Germany:7403|ms
   - frontend.navtiming2.gaps.desktop.anonymous:12|ms
   - frontend.navtiming2.gaps.desktop.overall:12|ms
   - frontend.navtiming2.gaps.overall:12|ms
   - frontend.navtiming2.gaps.by_browser.Edge.15:12|ms
   - frontend.navtiming2.gaps.by_browser.Edge.all:12|ms
   - frontend.navtiming2.gaps.by_continent.Europe:12|ms
-  - frontend.navtiming2.gaps.by_country.France:12|ms
+  - frontend.navtiming2.gaps.by_country.Germany:12|ms
   - frontend.navtiming_group.other:1|c
 
 # Sample from February 2018 (added 'isOversample', 'oversampleReason')
@@ -601,7 +601,7 @@ CpuBenchmark:
   - {"event": {"pageviewToken":"example", "score":40, "batteryLevel":0.05, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
   - {"event": {"pageviewToken":"example", "score":150, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "CpuBenchmark", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  metrics:
-  - ['cpubenchmark_seconds_count', {'origin_country': 'France', 'platform': 'desktop','is_oversample': 'True'}, 4]
+  - ['cpubenchmark_seconds_count', {'origin_country': 'other', 'platform': 'desktop','is_oversample': 'True'}, 4]
 
 FirstInputDelay:
  input:
@@ -610,7 +610,7 @@ FirstInputDelay:
   - {"event": {"pageviewToken":"example", "inputDelay":40, "batteryLevel":0.05, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
   - {"event": {"pageviewToken":"example", "inputDelay":150, "isOversample":true, "isAnon":false, "oversampleReason": "[\"wiki:cawiki\"]", "originCountry":"FR" }, "revision":19000009, "schema": "FirstInputDelay", "seqId": 1, "timestamp": 1, "userAgent": "{\"os_minor\": null, \"is_bot\": false, \"os_major\": null, \"device_family\": \"Other\", \"os_family\": \"Windows 8.1\", \"browser_minor\": \"0\", \"wmf_app_version\": \"-\", \"browser_major\": \"55\", \"browser_family\": \"Firefox\", \"is_mediawiki\": false}", "uuid": "example", "webHost": "ca.wikipedia.org", "wiki": "cawiki"}
  metrics:
-  - ['firstinputdelay_seconds_count', {'geo_country': 'France', 'geo_continent': 'Europe', 'mw_skin': 'unknown','is_oversample': 'True'}, 4]
+  - ['firstinputdelay_seconds_count', {'geo_country': 'other', 'geo_continent': 'Europe', 'mw_skin': 'unknown','is_oversample': 'True'}, 4]
 
 # Sample from 13/12-2022 (modified to add longtask)
 Largest contentful paint, Cumulative layout shift, network info and longtask:
