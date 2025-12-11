@@ -185,6 +185,9 @@ class NavTiming(object):
             'enwiki': 'group2',        # en.wikipedia.org
             'frwiki': 'group2',        # fr.wikipedia.org
             'ruwiki': 'group2',        # ru.wikipedia.org
+            'idwiki': 'parsoid_idwiki',  # id.wikipedia.org
+            'itwiki': 'parsoid_itwiki',  # it.wikipedia.org
+            'nlwiki': 'parsoid_nlwiki',  # nl.wikipedia.org
         }
 
         # We reduce cardinality in Prometheus and when we remove Graphite
